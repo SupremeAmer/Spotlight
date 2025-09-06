@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>SupremeAmer Word Connect Game</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Word Connect Challenge</title>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/appwrite@10.0.0"></script>
@@ -13,6 +13,8 @@
       --secondary: #fdc500;
       --success: #2ecc71;
       --error: #e74c3c;
+      --info: #3498db;
+      --purple: #9b59b6;
       --bg: #111;
       --panel: rgba(30, 30, 40, 0.95);
       --text: #fff;
@@ -27,14 +29,1197 @@
       --pulse: 0 0 15px rgba(255, 152, 0, 0.7);
     }
     
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
     body {
       font-family: 'Montserrat', Arial, sans-serif;
-      margin: 0;
       min-height: 100vh;
       background: linear-gradient(135deg, var(--bg) 70%, var(--primary) 100%);
       color: var(--text);
       display: flex;
       flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 20px;
+    }
+    
+    .header {
+      width: 100%;
+      max-width: 600px;
+      padding: 20px 0;
+      text-align: center;
+      background: rgba(0,0,0,0.7);
+      font-size: 2em;
+      font-weight: bold;
+      letter-spacing: 2px;
+      box-shadow: 0 2px 16px rgba(255, 235, 59, 0.2);
+      border-radius: 15px;
+      margin-bottom: 20px;
+      position: relative;
+    }
+    
+    /* Auth Modal Styles */
+    .auth-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 10000;
+      backdrop-filter: blur(5px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .auth-container {
+      background: var(--panel);
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+    }
+    
+    .auth-tabs {
+      display: flex;
+      margin-bottom: 20px;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    
+    .auth-tab {
+      flex: 1;
+      padding: 12px;
+      background: #222;
+      color: var(--text);
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .auth-tab.active {
+      background: var(--primary);
+      color: #000;
+    }
+    
+    .auth-form {
+      display: none;
+    }
+    
+    .auth-form.active {
+      display: block;
+    }
+    
+    .auth-input {
+      width: 100%;
+      padding: 12px 15px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border: 2px solid #333;
+      background: #222;
+      color: var(--text);
+      font-size: 16px;
+    }
+    
+    .auth-input:focus {
+      border-color: var(--primary);
+      outline: none;
+    }
+    
+    .auth-btn {
+      width: 100%;
+      padding: 14px;
+      margin-top: 15px;
+      background: linear-gradient(90deg, var(--secondary) 40%, var(--primary) 100%);
+      color: #111;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .auth-btn:hover {
+      background: linear-gradient(90deg, var(--primary) 40%, var(--secondary) 100%);
+      transform: translateY(-2px);
+    }
+    
+    .user-info {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 18px;
+    }
+    
+    .logout-btn {
+      background: #e74c3c;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 5px 10px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    
+    .container {
+      background: var(--panel);
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      text-align: center;
+      max-width: 600px;
+      width: 100%;
+      margin-bottom: 80px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .container::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255, 184, 0, 0.1) 0%, transparent 70%);
+      z-index: -1;
+      animation: rotate 60s linear infinite;
+    }
+    
+    @keyframes rotate {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .game-title {
+      font-size: 1.5em;
+      color: var(--secondary);
+      margin-bottom: 15px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    .stats-container {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      margin-bottom: 20px;
+    }
+    
+    .stat-box {
+      background: #222;
+      border-radius: 10px;
+      padding: 10px 15px;
+      text-align: center;
+      flex: 1;
+      margin: 0 5px;
+    }
+    
+    .stat-value {
+      font-size: 1.2em;
+      font-weight: bold;
+      color: var(--secondary);
+    }
+    
+    .stat-label {
+      font-size: 0.8em;
+      color: #bbb;
+    }
+    
+    .tournament-section {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+    
+    .tournament-title {
+      color: var(--secondary);
+      font-size: 1.2em;
+      margin-bottom: 10px;
+    }
+    
+    .tournament-info {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    
+    .tournament-btn {
+      background: linear-gradient(90deg, var(--purple), #8e44ad);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 12px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s;
+      width: 100%;
+    }
+    
+    .tournament-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(155, 89, 182, 0.4);
+    }
+    
+    .tournament-btn:disabled {
+      background: #444;
+      color: #bbb;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    
+    #grid {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin: 20px 0;
+      flex-wrap: wrap;
+    }
+    
+    .cell {
+      width: 45px;
+      height: 45px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--cell-bg);
+      border: 2px solid var(--cell-border);
+      border-radius: 8px;
+      font-size: 24px;
+      font-weight: bold;
+      color: var(--text);
+      transition: all 0.3s;
+    }
+    
+    #selector {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin: 0 0 20px 0;
+      flex-wrap: wrap;
+    }
+    
+    .letter {
+      width: 50px;
+      height: 50px;
+      background: var(--letter-bg);
+      border: 2px solid var(--letter-border);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+      user-select: none;
+      box-shadow: 0 1px 6px rgba(253, 197, 0, 0.2);
+      color: var(--letter-text);
+    }
+    
+    .letter.selected {
+      background: var(--primary);
+      transform: scale(0.94);
+      opacity: 0.7;
+      color: var(--text);
+    }
+    
+    #input-word {
+      font-size: 26px;
+      letter-spacing: 3px;
+      margin-bottom: 15px;
+      min-height: 40px;
+      font-weight: bold;
+      color: var(--text);
+      text-align: center;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    #footer-buttons {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      width: 100%;
+      margin: 0 0 15px 0;
+      gap: 10px;
+    }
+    
+    .main-btn {
+      background: linear-gradient(90deg, var(--secondary) 40%, var(--primary) 100%);
+      color: #111;
+      border: none;
+      border-radius: 8px;
+      font-size: 1em;
+      padding: 12px 20px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.3s;
+      box-shadow: 0 2px 8px rgba(255, 152, 0, 0.4);
+      min-width: 100px;
+    }
+    
+    .main-btn:hover {
+      background: linear-gradient(90deg, var(--primary) 40%, var(--secondary) 100%);
+      color: var(--text);
+      box-shadow: 0 4px 16px rgba(255, 152, 0, 0.6);
+      transform: translateY(-2px);
+    }
+    
+    .main-btn:disabled {
+      background: #444;
+      color: #bbb;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+    
+    #history-list {
+      margin-top: 20px;
+      width: 100%;
+      max-width: 500px;
+      min-height: 30px;
+      text-align: left;
+      font-size: 15px;
+      color: var(--text);
+      display: none;
+    }
+    
+    .history-item {
+      background: var(--history-bg);
+      border-radius: 7px;
+      margin-bottom: 8px;
+      padding: 8px 12px;
+      color: var(--history-text);
+      font-weight: bold;
+      transition: all 0.3s;
+    }
+    
+    .history-item:hover {
+      transform: translateX(5px);
+    }
+    
+    .footer {
+      width: 100%;
+      max-width: 600px;
+      display: flex;
+      justify-content: space-evenly;
+      padding: 15px 0;
+      background: rgba(255, 184, 0, 0.09);
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      border-radius: 18px 18px 0 0;
+      box-shadow: 0 -4px 24px rgba(255, 152, 0, 0.13);
+      z-index: 999;
+      backdrop-filter: blur(5px);
+    }
+    
+    .footer button {
+      background: #fff;
+      color: var(--primary);
+      border: none;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      font-size: 1.3em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(34, 34, 34, 0.13);
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+    
+    .footer button:hover {
+      background: var(--primary);
+      color: #fff;
+      transform: translateY(-5px);
+    }
+    
+    .footer button.active {
+      background: var(--primary);
+      color: #fff;
+    }
+    
+    /* Confetti */
+    .confetti {
+      position: fixed;
+      width: 10px;
+      height: 10px;
+      background-color: #f00;
+      opacity: 0;
+      z-index: 2001;
+      animation: confetti-fall 3s linear forwards;
+    }
+    
+    @keyframes confetti-fall {
+      0% {
+        transform: translateY(-100vh) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(100vh) rotate(360deg);
+        opacity: 0;
+      }
+    }
+    
+    /* Animations */
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    
+    .bounce {
+      animation: bounce 1s;
+    }
+    
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-5px); }
+      40%, 80% { transform: translateX(5px); }
+    }
+    
+    .shake {
+      animation: shake 0.5s;
+    }
+    
+    /* Responsive */
+    @media (max-width: 600px) {
+      .header {
+        font-size: 1.6em;
+        padding: 15px 0;
+      }
+      
+      .container {
+        padding: 20px 15px;
+      }
+      
+      .stats-container {
+        flex-direction: column;
+        gap: 10px;
+      }
+      
+      .stat-box {
+        margin: 5px 0;
+      }
+      
+      .cell {
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+      }
+      
+      .letter {
+        width: 45px;
+        height: 45px;
+        font-size: 20px;
+      }
+      
+      .footer button {
+        width: 45px;
+        height: 45px;
+        font-size: 1.1em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    WORD CONNECT CHALLENGE
+    <div class="user-info" id="user-info" style="display:none;">
+      <div class="user-avatar" id="user-avatar">U</div>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+  </div>
+  
+  <!-- Auth Modal -->
+  <div class="auth-modal" id="auth-modal">
+    <div class="auth-container">
+      <div class="auth-tabs">
+        <button class="auth-tab active" onclick="showAuthForm('login')">Login</button>
+        <button class="auth-tab" onclick="showAuthForm('register')">Register</button>
+      </div>
+      
+      <form id="login-form" class="auth-form active" onsubmit="login(event)">
+        <input type="email" class="auth-input" id="login-email" placeholder="Email" required>
+        <input type="password" class="auth-input" id="login-password" placeholder="Password" required>
+        <button type="submit" class="auth-btn">Login</button>
+      </form>
+      
+      <form id="register-form" class="auth-form" onsubmit="register(event)">
+        <input type="text" class="auth-input" id="register-name" placeholder="Full Name" required>
+        <input type="email" class="auth-input" id="register-email" placeholder="Email" required>
+        <input type="password" class="auth-input" id="register-password" placeholder="Password" required>
+        <button type="submit" class="auth-btn">Register</button>
+      </form>
+    </div>
+  </div>
+  
+  <div class="container" id="game-container" style="display:none;">
+    <div class="game-title">Word Connect Challenge</div>
+    
+    <div class="stats-container">
+      <div class="stat-box">
+        <div class="stat-value" id="slx-balance">0</div>
+        <div class="stat-label">SLX Points</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-value" id="level-display">0</div>
+        <div class="stat-label">Level</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-value" id="streak-display">0</div>
+        <div class="stat-label">Streak</div>
+      </div>
+    </div>
+    
+    <div class="tournament-section">
+      <div class="tournament-title">Tournament Challenge</div>
+      <div class="tournament-info">
+        <span>Entry Fee: 1500 SLX</span>
+        <span>Prize: 3000 SLX</span>
+      </div>
+      <button class="tournament-btn" id="tournament-btn" onclick="joinTournament()">Join Tournament</button>
+    </div>
+    
+    <div id="reward-msg"></div>
+    
+    <div id="grid"></div>
+    <div id="input-word"></div>
+    <div id="selector"></div>
+    
+    <div id="footer-buttons">
+      <button class="main-btn" id="submit-btn">
+        <i class="fas fa-check"></i> SUBMIT
+      </button>
+      <button class="main-btn" id="history-btn">
+        <i class="fas fa-history"></i> History
+      </button>
+      <button class="main-btn" id="restart-btn">
+        <i class="fas fa-redo"></i> Restart
+      </button>
+    </div>
+    
+    <div id="history-list"></div>
+  </div>
+  
+  <div class="footer">
+    <button onclick="showSection('home')" title="Home">
+      <i class="fas fa-home"></i>
+    </button>
+    <button onclick="showSection('tasks')" title="Tasks">
+      <i class="fas fa-tasks"></i>
+    </button>
+    <button onclick="showSection('wallet')" title="Wallet">
+      <i class="fas fa-wallet"></i>
+    </button>
+    <button onclick="showSection('games')" title="Games" class="active">
+      <i class="fas fa-gamepad"></i>
+    </button>
+  </div>
+  
+  <div id="confetti-container"></div>
+
+  <script>
+    // --- APPWRITE CONFIGURATION ---
+    // Note: In a real application, these should be set to your actual Appwrite project details
+    const APPWRITE_ENDPOINT = 'https://cloud.appwrite.io/v1';
+    const APPWRITE_PROJECT = 'your_project_id_here';
+    const APPWRITE_DB_ID = 'your_database_id_here';
+    const APPWRITE_COLLECTION_ID = 'users';
+    
+    // Initialize Appwrite client (commented out for demo purposes)
+    /*
+    const client = new Appwrite.Client();
+    client.setEndpoint(APPWRITE_ENDPOINT).setProject(APPWRITE_PROJECT);
+    
+    const account = new Appwrite.Account(client);
+    const databases = new Appwrite.Databases(client);
+    */
+    
+    // --- GAME STATE ---
+    let gameState = {
+      level: 0,
+      slxPoints: 0,
+      foundLevels: [],
+      history: [],
+      difficulty: 'easy',
+      streak: 0,
+      lastPlayed: null,
+      userId: null,
+      inTournament: false,
+      userName: null
+    };
+    
+    // --- WORD DATA ---
+    const WORDS = [
+      // Crypto & Tech Terms
+      "nft","defi","coin","token","blockchain","mining","bitcoin","ethereum","wallet","exchange",
+      "smartcontract","altcoin","stablecoin","gasfee","hashrate","nodes","whitepaper","airdrops","staking","yieldfarming",
+      
+      // General Words
+      "hide","veil","skin","stock","secret","furtive","covert","latent","conceal","hideout",
+      "secrete","stash","hider","hidden","exposed","anonymous","pseudonym","incognito","mask","pokerface",
+      "cloak","services","products","software","research","comments","national","internet","shipping","reserved",
+      "security","american","computer","download","pictures","personal","location","children","students","shopping",
+      
+      // Longer Challenge Words
+      "cryptocurrency","decentralized","authentication","confidentiality","infrastructure","biometrics","surveillance",
+      "encryption","firewall","malware","phishing","ransomware","vulnerability","cybersecurity","authentication",
+      "authorization","blockchain","confidential","cryptography","cyberattack","cybercrime","cyberwarfare",
+      "databreach","digitalfootprint","digitalidentity","endtoendencryption","ethicalhacking","fingerprintscanner",
+      "identitytheft","intrusiondetection","multi-factor-authentication","passwordmanager","privacypolicy",
+      "securityaudit","securityprotocol","socialengineering","twofactorauthentication","virtualprivatenetwork"
+    ];
+    
+    const WORD_TIERS = {
+      easy: WORDS.filter(word => word.length <= 5),
+      medium: WORDS.filter(word => word.length > 5 && word.length <= 8),
+      hard: WORDS.filter(word => word.length > 8)
+    };
+    
+    // --- AUTHENTICATION FUNCTIONS ---
+    function showAuthForm(formType) {
+      document.querySelectorAll('.auth-form').forEach(form => form.classList.remove('active'));
+      document.querySelectorAll('.auth-tab').forEach(tab => tab.classList.remove('active'));
+      
+      document.getElementById(`${formType}-form`).classList.add('active');
+      document.querySelector(`.auth-tab[onclick="showAuthForm('${formType}')"]`).classList.add('active');
+    }
+    
+    async function register(e) {
+      e.preventDefault();
+      
+      const name = document.getElementById('register-name').value;
+      const email = document.getElementById('register-email').value;
+      const password = document.getElementById('register-password').value;
+      
+      try {
+        // In a real app, this would use Appwrite to create a user
+        // For demo purposes, we'll simulate a successful registration
+        simulateAppwriteCall(() => {
+          // Create user account simulation
+          const userId = 'user_' + Math.random().toString(36).substr(2, 9);
+          
+          // Hide auth modal and show game
+          document.getElementById('auth-modal').style.display = 'none';
+          document.getElementById('game-container').style.display = 'flex';
+          document.getElementById('user-info').style.display = 'flex';
+          document.getElementById('user-avatar').textContent = name.charAt(0).toUpperCase();
+          
+          // Initialize game state
+          gameState.userId = userId;
+          gameState.slxPoints = 50000; // Starting balance
+          gameState.userName = name;
+          updateDisplay();
+          
+          // Load game
+          loadGame();
+          renderGame();
+          
+          showPopup('Registration successful! 50,000 SLX points added to your account.', 'success');
+        });
+        
+      } catch (error) {
+        console.error('Registration error:', error);
+        showPopup('Registration failed. Please try again.', 'error');
+      }
+    }
+    
+    async function login(e) {
+      e.preventDefault();
+      
+      const email = document.getElementById('login-email').value;
+      const password = document.getElementById('login-password').value;
+      
+      try {
+        // In a real app, this would use Appwrite to authenticate
+        // For demo purposes, we'll simulate a successful login
+        simulateAppwriteCall(() => {
+          // Simulate user data retrieval
+          const userId = 'user_' + Math.random().toString(36).substr(2, 9);
+          const name = email.split('@')[0];
+          
+          // Hide auth modal and show game
+          document.getElementById('auth-modal').style.display = 'none';
+          document.getElementById('game-container').style.display = 'flex';
+          document.getElementById('user-info').style.display = 'flex';
+          document.getElementById('user-avatar').textContent = name.charAt(0).toUpperCase();
+          
+          // Initialize game state
+          gameState.userId = userId;
+          gameState.slxPoints = 50000; // Default balance for demo
+          gameState.userName = name;
+          updateDisplay();
+          
+          // Load game
+          loadGame();
+          renderGame();
+          
+          showPopup('Login successful!', 'success');
+        });
+        
+      } catch (error) {
+        console.error('Login error:', error);
+        showPopup('Login failed. Please check your credentials.', 'error');
+      }
+    }
+    
+    function logout() {
+      document.getElementById('auth-modal').style.display = 'flex';
+      document.getElementById('game-container').style.display = 'none';
+      document.getElementById('user-info').style.display = 'none';
+      showPopup('You have been logged out.', 'info');
+    }
+    
+    // --- GAME FUNCTIONS ---
+    function updateDisplay() {
+      document.getElementById("slx-balance").textContent = gameState.slxPoints.toLocaleString();
+      document.getElementById("level-display").textContent = gameState.level + 1;
+      document.getElementById("streak-display").textContent = gameState.streak;
+    }
+    
+    function saveGame() {
+      localStorage.setItem('wordGameState', JSON.stringify(gameState));
+    }
+    
+    function loadGame() {
+      const data = localStorage.getItem('wordGameState');
+      if (data) {
+        try {
+          const obj = JSON.parse(data);
+          if (typeof obj === "object" && obj.userId === gameState.userId) {
+            gameState = {...gameState, ...obj};
+            checkDailyReset();
+          }
+        } catch {}
+      }
+    }
+    
+    function checkDailyReset() {
+      const today = new Date().toDateString();
+      if (gameState.lastPlayed !== today) {
+        gameState.streak = 0;
+        gameState.lastPlayed = today;
+        saveGame();
+      }
+    }
+    
+    function resetGame() {
+      if (confirm("Restart the game? Your progress will be lost!")) {
+        gameState.level = 0;
+        gameState.foundLevels = [];
+        gameState.history = [];
+        gameState.difficulty = 'easy';
+        gameState.streak = 0;
+        gameState.lastPlayed = new Date().toDateString();
+        gameState.inTournament = false;
+        
+        document.getElementById('tournament-btn').disabled = false;
+        document.getElementById('tournament-btn').textContent = 'Join Tournament';
+        
+        saveGame();
+        renderGame();
+        updateDisplay();
+      }
+    }
+    
+    function getLevelReward(level) {
+      const baseReward = 30 * (level + 1);
+      
+      let multiplier = 1;
+      if (gameState.difficulty === 'medium') multiplier = 1.5;
+      if (gameState.difficulty === 'hard') multiplier = 2;
+      
+      const streakBonus = Math.min(gameState.streak, 5) * 0.1;
+      
+      return Math.floor(baseReward * multiplier * (1 + streakBonus));
+    }
+    
+    function getCurrentWord() {
+      const tier = WORD_TIERS[gameState.difficulty];
+      return tier[gameState.level % tier.length];
+    }
+    
+    function renderGame() {
+      document.getElementById("history-list").style.display = "none";
+      updateDisplay();
+      
+      const word = getCurrentWord();
+      if (!word) {
+        document.getElementById("level").innerHTML = `
+          <span style="color:#fdc500;font-size:1.3em;">
+            Congratulations!<br/>You finished all ${gameState.difficulty} levels!
+          </span>`;
+        document.getElementById("reward-msg").textContent = "";
+        document.getElementById("grid").innerHTML = "";
+        document.getElementById("selector").innerHTML = "";
+        document.getElementById("input-word").innerText = "";
+        document.getElementById("submit-btn").disabled = true;
+        return;
+      }
+      
+      document.getElementById("submit-btn").disabled = false;
+      document.getElementById("reward-msg").textContent = "";
+      
+      // Render grid
+      const gridDiv = document.getElementById("grid");
+      gridDiv.innerHTML = "";
+      const grid = Array.from(word.replace(/ /g, '').toUpperCase());
+      
+      for (let i = 0; i < grid.length; i++) {
+        const cell = document.createElement("div");
+        cell.className = "cell";
+        cell.innerText = "";
+        gridDiv.appendChild(cell);
+      }
+      
+      // Render selector
+      const selectorDiv = document.getElementById("selector");
+      selectorDiv.innerHTML = "";
+      const letters = shuffle(Array.from(word.replace(/ /g, '').toUpperCase()));
+      let input = "";
+      
+      letters.forEach((letter, idx) => {
+        const div = document.createElement("div");
+        div.className = "letter";
+        div.innerText = letter;
+        div.onclick = () => {
+          if (!div.classList.contains("selected")) {
+            div.classList.add("selected");
+            input += letter;
+            document.getElementById("input-word").innerText = input;
+          }
+        };
+        selectorDiv.appendChild(div);
+      });
+      
+      document.getElementById("input-word").innerText = "";
+      
+      // Submit logic
+      document.getElementById("submit-btn").onclick = () => {
+        const currentWord = getCurrentWord().replace(/ /g, '').toLowerCase();
+        const userWord = input.replace(/ /g, '').toLowerCase();
+        
+        if (userWord === currentWord) {
+          // Correct answer
+          const reward = getLevelReward(gameState.level);
+          gameState.slxPoints += reward;
+          gameState.foundLevels.push(gameState.level);
+          gameState.level += 1;
+          gameState.streak += 1;
+          gameState.lastPlayed = new Date().toDateString();
+          
+          gameState.history.push({
+            type: "level-up",
+            level: gameState.level,
+            amount: reward,
+            difficulty: gameState.difficulty,
+            streak: gameState.streak,
+            timestamp: Date.now()
+          });
+          
+          saveGame();
+          updateDisplay();
+          
+          // Visual feedback
+          document.getElementById("reward-msg").style.color = "var(--success)";
+          document.getElementById("reward-msg").innerHTML = `
+            <i class="fas fa-check"></i> Correct! +${reward} SLX coins
+          `;
+          document.getElementById("reward-msg").classList.add("bounce");
+          
+          // Check if user won a tournament
+          if (gameState.inTournament && gameState.level % 5 === 0) {
+            awardTournamentPrize();
+          }
+          
+          // Celebrate!
+          createConfetti();
+          
+          // Check difficulty progression
+          checkDifficultyProgression();
+          
+          setTimeout(() => {
+            document.getElementById("reward-msg").classList.remove("bounce");
+            renderGame();
+          }, 1500);
+        } else {
+          // Incorrect answer
+          gameState.streak = 0;
+          saveGame();
+          updateDisplay();
+          
+          document.getElementById("reward-msg").style.color = "var(--error)";
+          document.getElementById("reward-msg").innerHTML = `
+            <i class="fas fa-times"></i> Try again!
+          `;
+          document.getElementById("reward-msg").classList.add("shake");
+          
+          document.getElementById("input-word").innerText = "";
+          input = "";
+          
+          document.querySelectorAll(".letter").forEach(x => x.classList.remove("selected"));
+          
+          setTimeout(() => {
+            document.getElementById("reward-msg").classList.remove("shake");
+          }, 500);
+        }
+      };
+    }
+    
+    function checkDifficultyProgression() {
+      const easyLevels = WORD_TIERS.easy.length;
+      const mediumLevels = WORD_TIERS.medium.length;
+      
+      if (gameState.difficulty === 'easy' && gameState.level >= easyLevels) {
+        gameState.difficulty = 'medium';
+        showPopup("Difficulty increased to Medium!", "success");
+      } else if (gameState.difficulty === 'medium' && gameState.level >= easyLevels + mediumLevels) {
+        gameState.difficulty = 'hard';
+        showPopup("Difficulty increased to Hard!", "success");
+      }
+    }
+    
+    function showHistory() {
+      const list = document.getElementById("history-list");
+      list.innerHTML = "";
+      
+      if (!gameState.history.length) {
+        list.innerHTML = "<div style='text-align:center;color:#bbb;'>No transactions yet.</div>";
+      } else {
+        gameState.history.slice().reverse().forEach(tx => {
+          const date = new Date(tx.timestamp).toLocaleString();
+          if (tx.type === "level-up") {
+            list.innerHTML += `
+              <div class="history-item">
+                <i class="fas fa-level-up-alt"></i> 
+                [${date}] Level ${tx.level} (${tx.difficulty})<br>
+                <span style="color:#2ecc71;">
+                  +${tx.amount} SLX (Streak: ${tx.streak})
+                </span>
+              </div>`;
+          } else if (tx.type === "tournament-join") {
+            list.innerHTML += `
+              <div class="history-item">
+                <i class="fas fa-trophy"></i> 
+                [${date}] Tournament Entry<br>
+                <span style="color:#e74c3c;">
+                  -${Math.abs(tx.amount)} SLX
+                </span>
+              </div>`;
+          } else if (tx.type === "tournament-win") {
+            list.innerHTML += `
+              <div class="history-item">
+                <i class="fas fa-trophy"></i> 
+                [${date}] Tournament Win<br>
+                <span style="color:#2ecc71;">
+                  +${tx.amount} SLX
+                </span>
+              </div>`;
+          }
+        });
+      }
+      
+      list.style.display = "block";
+    }
+    
+    function joinTournament() {
+      if (gameState.slxPoints < 1500) {
+        showPopup('You need at least 1500 SLX to join the tournament!', 'error');
+        return;
+      }
+      
+      if (confirm('Join tournament for 1500 SLX? Winner gets 3000 SLX!')) {
+        // Deduct tournament fee
+        gameState.slxPoints -= 1500;
+        updateDisplay();
+        
+        gameState.inTournament = true;
+        document.getElementById('tournament-btn').disabled = true;
+        document.getElementById('tournament-btn').textContent = 'Tournament Active!';
+        
+        // Add to history
+        gameState.history.push({
+          type: "tournament-join",
+          amount: -1500,
+          timestamp: Date.now()
+        });
+        
+        saveGame();
+        showPopup('Tournament joined! Complete 5 levels to win 3000 SLX!', 'success');
+      }
+    }
+    
+    function awardTournamentPrize() {
+      if (gameState.inTournament) {
+        // Award prize
+        gameState.slxPoints += 3000;
+        updateDisplay();
+        
+        // Add to history
+        gameState.history.push({
+          type: "tournament-win",
+          amount: 3000,
+          timestamp: Date.now()
+        });
+        
+        // Reset tournament state
+        gameState.inTournament = false;
+        document.getElementById('tournament-btn').disabled = false;
+        document.getElementById('tournament-btn').textContent = 'Join Tournament';
+        
+        saveGame();
+        
+        // Show celebration
+        showPopup('Congratulations! You won the tournament and earned 3000 SLX!', 'success');
+        createConfetti();
+      }
+    }
+    
+    // --- UTILITY FUNCTIONS ---
+    function shuffle(array) {
+      let a = array.slice();
+      for (let i = a.length - 1; i > 0; i--) {
+        let j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+    
+    function showPopup(msg, type) {
+      const popup = document.createElement("div");
+      popup.style.position = "fixed";
+      popup.style.top = "20px";
+      popup.style.left = "50%";
+      popup.style.transform = "translateX(-50%)";
+      popup.style.padding = "10px 20px";
+      popup.style.borderRadius = "5px";
+      popup.style.zIndex = "1000";
+      popup.style.fontWeight = "bold";
+      
+      if (type === "success") {
+        popup.style.background = "#2ecc71";
+        popup.style.color = "white";
+      } else if (type === "error") {
+        popup.style.background = "#e74c3c";
+        popup.style.color = "white";
+      } else {
+        popup.style.background = "#3498db";
+        popup.style.color = "white";
+      }
+      
+      popup.textContent = msg;
+      document.body.appendChild(popup);
+      
+      setTimeout(() => {
+        popup.remove();
+      }, 3000);
+    }
+    
+    function createConfetti() {
+      const container = document.getElementById("confetti-container");
+      const colors = ['#ff9800', '#fdc500', '#ff3333', '#4CAF50', '#2196F3', '#9b59b6'];
+      
+      for (let i = 0; i < 100; i++) {
+        const confetti = document.createElement("div");
+        confetti.className = 'confetti';
+        
+        confetti.style.left = `${Math.random() * 100}vw`;
+        
+        const size = Math.random() * 10 + 5;
+        confetti.style.width = `${size}px`;
+        confetti.style.height = `${size}px`;
+        
+        if (Math.random() > 0.5) {
+          confetti.style.borderRadius = '50%';
+        }
+        
+        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        
+        const duration = Math.random() * 3 + 2;
+        confetti.style.animationDuration = `${duration}s`;
+        
+        container.appendChild(confetti);
+        
+        setTimeout(() => {
+          confetti.remove();
+        }, duration * 1000);
+      }
+    }
+    
+    function showSection(section) {
+      // For demo purposes, just show a message
+      showPopup(`"${section.charAt(0).toUpperCase() + section.slice(1)}" section would be shown here`, 'info');
+    }
+    
+    function simulateAppwriteCall(callback) {
+      // Simulate network delay
+      setTimeout(callback, 500);
+    }
+    
+    // Initialize the app
+    window.onload = function() {
+      // Check if user is already logged in (for demo purposes)
+      const savedState = localStorage.getItem('wordGameState');
+      if (savedState) {
+        try {
+          const parsedState = JSON.parse(savedState);
+          if (parsedState.userId) {
+            document.getElementById('auth-modal').style.display = 'none';
+            document.getElementById('game-container').style.display = 'flex';
+            document.getElementById('user-info').style.display = 'flex';
+            document.getElementById('user-avatar').textContent = parsedState.userName ? parsedState.userName.charAt(0).toUpperCase() : 'U';
+            
+            gameState = parsedState;
+            updateDisplay();
+            renderGame();
+          }
+        } catch (e) {
+          console.error('Error loading saved state:', e);
+        }
+      }
+    };
+    
+    // Button event listeners
+    document.getElementById("history-btn").onclick = function() {
+      showHistory();
+    };
+    
+    document.getElementById("restart-btn").onclick = function() {
+      resetGame();
+    };
+  </script>
+</body>
+</html>      flex-direction: column;
       align-items: center;
       justify-content: flex-start;
     }
