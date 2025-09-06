@@ -6,6 +6,7 @@
   <title>Word Connect - Authentication</title>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/appwrite@10.0.0"></script>
   <style>
     :root {
       --primary: #ff9800;
@@ -35,6 +36,539 @@
       padding: 20px;
     }
     
+    .auth-container {
+      background: var(--panel);
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.38);
+      width: 90%;
+      max-width: 450px;
+      text-align: center;
+    }
+    
+    .logo {
+      margin-bottom: 25px;
+    }
+    
+    .logo h1 {
+      font-size: 2.2em;
+      color: var(--secondary);
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    .logo p {
+      color: #bbb;
+      margin-top: 5px;
+    }
+    
+    .auth-tabs {
+      display: flex;
+      margin-bottom: 20px;
+      border-radius: 10px;
+      overflow: hidden;
+      background: #222;
+    }
+    
+    .auth-tab {
+      flex: 1;
+      padding: 15px;
+      background: #222;
+      color: var(--text);
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 1.1em;
+    }
+    
+    .auth-tab.active {
+      background: var(--primary);
+      color: #000;
+    }
+    
+    .auth-form {
+      display: none;
+    }
+    
+    .auth-form.active {
+      display: block;
+    }
+    
+    .auth-input-group {
+      margin-bottom: 20px;
+      text-align: left;
+    }
+    
+    .auth-input-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: #bbb;
+      font-size: 0.9em;
+    }
+    
+    .auth-input {
+      width: 100%;
+      padding: 15px;
+      border-radius: 8px;
+      border: 2px solid #333;
+      background: #222;
+      color: var(--text);
+      font-size: 16px;
+      transition: all 0.3s;
+    }
+    
+    .auth-input:focus {
+      border-color: var(--primary);
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(255, 152, 0, 0.3);
+    }
+    
+    .auth-btn {
+      width: 100%;
+      padding: 16px;
+      margin-top: 10px;
+      background: linear-gradient(90deg, var(--secondary) 40%, var(--primary) 100%);
+      color: #111;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .auth-btn:hover {
+      background: linear-gradient(90deg, var(--primary) 40%, var(--secondary) 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(255, 152, 0, 0.4);
+    }
+    
+    .auth-btn:disabled {
+      background: #444;
+      color: #bbb;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    
+    .auth-footer {
+      margin-top: 25px;
+      color: #bbb;
+      font-size: 0.9em;
+    }
+    
+    .auth-footer a {
+      color: var(--secondary);
+      text-decoration: none;
+    }
+    
+    .auth-footer a:hover {
+      text-decoration: underline;
+    }
+    
+    .error-message {
+      color: var(--error);
+      margin-top: 15px;
+      padding: 10px;
+      background: rgba(231, 76, 60, 0.1);
+      border-radius: 5px;
+      border-left: 4px solid var(--error);
+      text-align: left;
+      font-size: 0.9em;
+    }
+    
+    .success-message {
+      color: var(--success);
+      margin-top: 15px;
+      padding: 10px;
+      background: rgba(46, 204, 113, 0.1);
+      border-radius: 5px;
+      border-left: 4px solid var(--success);
+      text-align: left;
+      font-size: 0.9em;
+    }
+    
+    .password-toggle {
+      position: relative;
+    }
+    
+    .password-toggle .auth-input {
+      padding-right: 50px;
+    }
+    
+    .toggle-password {
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: #bbb;
+      cursor: pointer;
+      font-size: 1.2em;
+    }
+    
+    @media (max-width: 600px) {
+      .auth-container {
+        padding: 20px 15px;
+      }
+      
+      .auth-tab {
+        padding: 12px;
+        font-size: 1em;
+      }
+      
+      .auth-input {
+        padding: 12px;
+      }
+      
+      .auth-btn {
+        padding: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="auth-container">
+    <div class="logo">
+      <h1>WORD CONNECT CHALLENGE</h1>
+      <p>Play, compete, and earn SLX points</p>
+    </div>
+    
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="login-tab">Login</button>
+      <button class="auth-tab" id="register-tab">Register</button>
+    </div>
+    
+    <form id="login-form" class="auth-form active">
+      <div class="auth-input-group">
+        <label for="login-email">Email Address</label>
+        <input type="email" class="auth-input" id="login-email" placeholder="Enter your email" required>
+      </div>
+      
+      <div class="auth-input-group password-toggle">
+        <label for="login-password">Password</label>
+        <input type="password" class="auth-input" id="login-password" placeholder="Enter your password" required>
+        <button type="button" class="toggle-password" id="login-toggle-password">
+          <i class="fas fa-eye"></i>
+        </button>
+      </div>
+      
+      <button type="submit" class="auth-btn" id="login-btn">
+        <i class="fas fa-sign-in-alt"></i> Login
+      </button>
+      
+      <div class="error-message" id="login-error" style="display: none;"></div>
+      
+      <div class="auth-footer">
+        <a href="#" id="forgot-password">Forgot your password?</a>
+      </div>
+    </form>
+    
+    <form id="register-form" class="auth-form">
+      <div class="auth-input-group">
+        <label for="register-name">Full Name</label>
+        <input type="text" class="auth-input" id="register-name" placeholder="Enter your full name" required>
+      </div>
+      
+      <div class="auth-input-group">
+        <label for="register-email">Email Address</label>
+        <input type="email" class="auth-input" id="register-email" placeholder="Enter your email" required>
+      </div>
+      
+      <div class="auth-input-group password-toggle">
+        <label for="register-password">Password</label>
+        <input type="password" class="auth-input" id="register-password" placeholder="Create a password" required>
+        <button type="button" class="toggle-password" id="register-toggle-password">
+          <i class="fas fa-eye"></i>
+        </button>
+      </div>
+      
+      <div class="auth-input-group">
+        <label for="register-confirm-password">Confirm Password</label>
+        <input type="password" class="auth-input" id="register-confirm-password" placeholder="Confirm your password" required>
+      </div>
+      
+      <button type="submit" class="auth-btn" id="register-btn">
+        <i class="fas fa-user-plus"></i> Create Account
+      </button>
+      
+      <div class="error-message" id="register-error" style="display: none;"></div>
+      <div class="success-message" id="register-success" style="display: none;"></div>
+      
+      <div class="auth-footer">
+        By registering, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    // Appwrite Configuration
+    const APPWRITE_ENDPOINT = 'https://fra.cloud.appwrite.io/v1';
+    const APPWRITE_PROJECT = '6839d9640019316a160d';
+    const APPWRITE_DB_ID = '6839dcca000190bf99f6';
+    const APPWRITE_COLLECTION_ID = 'users';
+    
+    // Initialize Appwrite
+    const client = new Appwrite.Client();
+    client.setEndpoint(APPWRITE_ENDPOINT).setProject(APPWRITE_PROJECT);
+    
+    const account = new Appwrite.Account(client);
+    const databases = new Appwrite.Databases(client);
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      // DOM Elements
+      const loginTab = document.getElementById('login-tab');
+      const registerTab = document.getElementById('register-tab');
+      const loginForm = document.getElementById('login-form');
+      const registerForm = document.getElementById('register-form');
+      const loginError = document.getElementById('login-error');
+      const registerError = document.getElementById('register-error');
+      const registerSuccess = document.getElementById('register-success');
+      const loginTogglePassword = document.getElementById('login-toggle-password');
+      const registerTogglePassword = document.getElementById('register-toggle-password');
+      const loginPassword = document.getElementById('login-password');
+      const registerPassword = document.getElementById('register-password');
+      const forgotPasswordLink = document.getElementById('forgot-password');
+      
+      // Switch between login and register forms
+      loginTab.addEventListener('click', function() {
+        loginTab.classList.add('active');
+        registerTab.classList.remove('active');
+        loginForm.classList.add('active');
+        registerForm.classList.remove('active');
+        clearMessages();
+      });
+      
+      registerTab.addEventListener('click', function() {
+        registerTab.classList.add('active');
+        loginTab.classList.remove('active');
+        registerForm.classList.add('active');
+        loginForm.classList.remove('active');
+        clearMessages();
+      });
+      
+      // Toggle password visibility
+      loginTogglePassword.addEventListener('click', function() {
+        togglePasswordVisibility(loginPassword, loginTogglePassword);
+      });
+      
+      registerTogglePassword.addEventListener('click', function() {
+        togglePasswordVisibility(registerPassword, registerTogglePassword);
+      });
+      
+      // Form submissions
+      loginForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        handleLogin();
+      });
+      
+      registerForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        handleRegistration();
+      });
+      
+      // Forgot password
+      forgotPasswordLink.addEventListener('click', function(e) {
+        e.preventDefault();
+        handleForgotPassword();
+      });
+      
+      // Functions
+      function togglePasswordVisibility(passwordField, toggleButton) {
+        if (passwordField.type === 'password') {
+          passwordField.type = 'text';
+          toggleButton.innerHTML = '<i class="fas fa-eye-slash"></i>';
+        } else {
+          passwordField.type = 'password';
+          toggleButton.innerHTML = '<i class="fas fa-eye"></i>';
+        }
+      }
+      
+      function clearMessages() {
+        loginError.style.display = 'none';
+        registerError.style.display = 'none';
+        registerSuccess.style.display = 'none';
+      }
+      
+      function showError(element, message) {
+        element.textContent = message;
+        element.style.display = 'block';
+      }
+      
+      function showSuccess(element, message) {
+        element.textContent = message;
+        element.style.display = 'block';
+      }
+      
+      async function handleLogin() {
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-password').value;
+        const loginBtn = document.getElementById('login-btn');
+        
+        // Basic validation
+        if (!email || !password) {
+          showError(loginError, 'Please fill in all fields');
+          return;
+        }
+        
+        // Email validation
+        if (!isValidEmail(email)) {
+          showError(loginError, 'Please enter a valid email address');
+          return;
+        }
+        
+        // Disable button during request
+        loginBtn.disabled = true;
+        loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
+        
+        try {
+          // Create session with Appwrite
+          await account.createEmailSession(email, password);
+          
+          // Get user data
+          const user = await account.get();
+          
+          // Successful login
+          loginBtn.innerHTML = '<i class="fas fa-check"></i> Login Successful!';
+          
+          // Redirect to game page after a brief delay
+          setTimeout(() => {
+            window.location.href = 'game.html?userId=' + user.$id;
+          }, 1500);
+        } catch (error) {
+          // Failed login
+          console.error('Login error:', error);
+          showError(loginError, 'Invalid email or password. Please try again.');
+          loginBtn.disabled = false;
+          loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login';
+        }
+      }
+      
+      async function handleRegistration() {
+        const name = document.getElementById('register-name').value;
+        const email = document.getElementById('register-email').value;
+        const password = document.getElementById('register-password').value;
+        const confirmPassword = document.getElementById('register-confirm-password').value;
+        const registerBtn = document.getElementById('register-btn');
+        
+        // Basic validation
+        if (!name || !email || !password || !confirmPassword) {
+          showError(registerError, 'Please fill in all fields');
+          return;
+        }
+        
+        // Email validation
+        if (!isValidEmail(email)) {
+          showError(registerError, 'Please enter a valid email address');
+          return;
+        }
+        
+        // Password validation
+        if (password.length < 8) {
+          showError(registerError, 'Password must be at least 8 characters long');
+          return;
+        }
+        
+        if (password !== confirmPassword) {
+          showError(registerError, 'Passwords do not match');
+          return;
+        }
+        
+        // Disable button during request
+        registerBtn.disabled = true;
+        registerBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Account...';
+        
+        try {
+          // Create user account with Appwrite
+          const user = await account.create('unique()', email, password, name);
+          
+          // Create user document in database with initial SLX points
+          await databases.createDocument(
+            APPWRITE_DB_ID,
+            APPWRITE_COLLECTION_ID,
+            'unique()',
+            {
+              userId: user.$id,
+              name: name,
+              email: email,
+              slxPoints: 50000,
+              level: 0,
+              gamesPlayed: 0,
+              gamesWon: 0
+            }
+          );
+          
+          // Create session
+          await account.createEmailSession(email, password);
+          
+          // Successful registration
+          showSuccess(registerSuccess, 'Account created successfully! Redirecting to game...');
+          registerBtn.innerHTML = '<i class="fas fa-check"></i> Account Created!';
+          
+          // Redirect to game page after a brief delay
+          setTimeout(() => {
+            window.location.href = 'game.html?userId=' + user.$id;
+          }, 2000);
+        } catch (error) {
+          console.error('Registration error:', error);
+          
+          // Check if email is already registered
+          if (error.type === 'user_already_exists') {
+            showError(registerError, 'This email is already registered. Please login instead.');
+          } else {
+            showError(registerError, 'Registration failed. Please try again.');
+          }
+          
+          registerBtn.disabled = false;
+          registerBtn.innerHTML = '<i class="fas fa-user-plus"></i> Create Account';
+        }
+      }
+      
+      async function handleForgotPassword() {
+        const email = document.getElementById('login-email').value || prompt('Please enter your email address:');
+        
+        if (!email) return;
+        
+        if (!isValidEmail(email)) {
+          showError(loginError, 'Please enter a valid email address');
+          return;
+        }
+        
+        try {
+          // Create password recovery
+          await account.createRecovery(email, 'https://yourdomain.com/recovery');
+          showSuccess(loginError, 'Password recovery email sent. Please check your inbox.');
+        } catch (error) {
+          console.error('Password recovery error:', error);
+          showError(loginError, 'Failed to send recovery email. Please try again.');
+        }
+      }
+      
+      function isValidEmail(email) {
+        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return re.test(email);
+      }
+      
+      // Check if there's a logged-in user
+      try {
+        const user = await account.get();
+        // If user is already logged in, redirect to game page
+        window.location.href = 'game.html?userId=' + user.$id;
+      } catch (error) {
+        // User is not logged in, show auth forms
+        console.log('User not logged in');
+      }
+      
+      // Check if there's a redirect message
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('loggedout') === 'true') {
+        showError(loginError, 'You have been logged out. Please login again.');
+      }
+    });
+  </script>
+</body>
+</html>    
     .auth-container {
       background: var(--panel);
       padding: 30px;
