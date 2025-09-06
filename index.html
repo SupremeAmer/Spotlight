@@ -207,6 +207,33 @@
       cursor: pointer;
       font-size: 1.2em;
     }
+
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10000;
+      display: none;
+    }
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: var(--primary);
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
     
     @media (max-width: 600px) {
       .auth-container {
@@ -229,6 +256,10 @@
   </style>
 </head>
 <body>
+  <div class="loading-overlay" id="loading-overlay">
+    <div class="spinner"></div>
+  </div>
+
   <div class="auth-container">
     <div class="logo">
       <h1>WORD CONNECT CHALLENGE</h1>
@@ -306,16 +337,13 @@
     // Appwrite Configuration
     const APPWRITE_ENDPOINT = 'https://fra.cloud.appwrite.io/v1';
     const APPWRITE_PROJECT = '6839d9640019316a160d';
-    const APPWRITE_DB_ID = '6839dcca000190bf99f6';
-    const APPWRITE_COLLECTION_ID = 'users';
     
     // Initialize Appwrite
     const client = new Appwrite.Client();
     client.setEndpoint(APPWRITE_ENDPOINT).setProject(APPWRITE_PROJECT);
     
     const account = new Appwrite.Account(client);
-    const databases = new Appwrite.Databases(client);
-    
+
     document.addEventListener('DOMContentLoaded', function() {
       // DOM Elements
       const loginTab = document.getElementById('login-tab');
@@ -330,6 +358,17 @@
       const loginPassword = document.getElementById('login-password');
       const registerPassword = document.getElementById('register-password');
       const forgotPasswordLink = document.getElementById('forgot-password');
+      const loadingOverlay = document.getElementById('loading-overlay');
+      
+      // Show loading overlay
+      function showLoading() {
+        loadingOverlay.style.display = 'flex';
+      }
+      
+      // Hide loading overlay
+      function hideLoading() {
+        loadingOverlay.style.display = 'none';
+      }
       
       // Switch between login and register forms
       loginTab.addEventListener('click', function() {
@@ -421,6 +460,7 @@
         // Disable button during request
         loginBtn.disabled = true;
         loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
+        showLoading();
         
         try {
           // Create session with Appwrite
@@ -432,9 +472,16 @@
           // Successful login
           loginBtn.innerHTML = '<i class="fas fa-check"></i> Login Successful!';
           
+          // Store user data in localStorage for the game page
+          localStorage.setItem('user', JSON.stringify({
+            id: user.$id,
+            name: user.name,
+            email: user.email
+          }));
+          
           // Redirect to game page after a brief delay
           setTimeout(() => {
-            window.location.href = 'game.html?userId=' + user.$id;
+            window.location.href = 'game.html';
           }, 1500);
         } catch (error) {
           // Failed login
@@ -442,6 +489,8 @@
           showError(loginError, 'Invalid email or password. Please try again.');
           loginBtn.disabled = false;
           loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login';
+        } finally {
+          hideLoading();
         }
       }
       
@@ -478,26 +527,11 @@
         // Disable button during request
         registerBtn.disabled = true;
         registerBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Account...';
+        showLoading();
         
         try {
           // Create user account with Appwrite
           const user = await account.create('unique()', email, password, name);
-          
-          // Create user document in database with initial SLX points
-          await databases.createDocument(
-            APPWRITE_DB_ID,
-            APPWRITE_COLLECTION_ID,
-            'unique()',
-            {
-              userId: user.$id,
-              name: name,
-              email: email,
-              slxPoints: 50000,
-              level: 0,
-              gamesPlayed: 0,
-              gamesWon: 0
-            }
-          );
           
           // Create session
           await account.createEmailSession(email, password);
@@ -506,15 +540,22 @@
           showSuccess(registerSuccess, 'Account created successfully! Redirecting to game...');
           registerBtn.innerHTML = '<i class="fas fa-check"></i> Account Created!';
           
+          // Store user data in localStorage for the game page
+          localStorage.setItem('user', JSON.stringify({
+            id: user.$id,
+            name: user.name,
+            email: user.email
+          }));
+          
           // Redirect to game page after a brief delay
           setTimeout(() => {
-            window.location.href = 'game.html?userId=' + user.$id;
+            window.location.href = 'game.html';
           }, 2000);
         } catch (error) {
           console.error('Registration error:', error);
           
           // Check if email is already registered
-          if (error.type === 'user_already_exists') {
+          if (error.message && error.message.includes('already')) {
             showError(registerError, 'This email is already registered. Please login instead.');
           } else {
             showError(registerError, 'Registration failed. Please try again.');
@@ -522,6 +563,8 @@
           
           registerBtn.disabled = false;
           registerBtn.innerHTML = '<i class="fas fa-user-plus"></i> Create Account';
+        } finally {
+          hideLoading();
         }
       }
       
@@ -535,13 +578,17 @@
           return;
         }
         
+        showLoading();
+        
         try {
           // Create password recovery
-          await account.createRecovery(email, 'https://yourdomain.com/recovery');
+          await account.createRecovery(email, window.location.origin + '/recovery.html');
           showSuccess(loginError, 'Password recovery email sent. Please check your inbox.');
         } catch (error) {
           console.error('Password recovery error:', error);
           showError(loginError, 'Failed to send recovery email. Please try again.');
+        } finally {
+          hideLoading();
         }
       }
       
@@ -551,13 +598,18 @@
       }
       
       // Check if there's a logged-in user
-      try {
-        const user = await account.get();
-        // If user is already logged in, redirect to game page
-        window.location.href = 'game.html?userId=' + user.$id;
-      } catch (error) {
-        // User is not logged in, show auth forms
-        console.log('User not logged in');
+      async function checkAuthStatus() {
+        try {
+          showLoading();
+          const user = await account.get();
+          // If user is already logged in, redirect to game page
+          window.location.href = 'game.html';
+        } catch (error) {
+          // User is not logged in, show auth forms
+          console.log('User not logged in');
+        } finally {
+          hideLoading();
+        }
       }
       
       // Check if there's a redirect message
@@ -565,6 +617,9 @@
       if (urlParams.get('loggedout') === 'true') {
         showError(loginError, 'You have been logged out. Please login again.');
       }
+      
+      // Initialize the authentication check
+      checkAuthStatus();
     });
   </script>
 </body>
