@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Register - SupremeAmer Coin Airdrop</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;400&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/appwrite@13.0.0"></script>
+  <style>
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #1e1e2f 65%, #ff9800 100%);
+      font-family: 'Montserrat', Arial, sans-serif;
+      margin: 0;
+    }
+    .register-card {
+      background: rgba(35, 35, 60, 0.8);
+      backdrop-filter: blur(8px);
+      border-radius: 24px;
+      box-shadow: 0 12px 40px #ff980055, 0 2px 24px #0008;
+      padding: 2.7em 2.1em 2.3em 2.1em;
+      min-width: 330px;
+      max-width: 90vw;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      border: 1.5px solid #fff2;
+    }
+    .register-card h2 {
+      color: #ffb900;
+      margin-bottom: 0.6em;
+      letter-spacing: 1px;
+      font-size: 2em;
+    }
+    .register-card label {
+      display: block;
+      font-size: 1em;
+      margin-bottom: 0.2em;
+      color: #fff;
+      font-weight: 400;
+      letter-spacing: 0.5px;
+    }
+    .register-card input {
+      width: 100%;
+      padding: 12px 14px;
+      margin-bottom: 1.3em;
+      border: 1.5px solid #ff980055;
+      border-radius: 8px;
+      font-size: 1em;
+      background: rgba(255,255,255,0.07);
+      color: #fff;
+      outline: none;
+      transition: border 0.2s, box-shadow 0.2s;
+      font-family: inherit;
+    }
+    .register-card input:focus {
+      border: 1.5px solid #ff9800;
+      box-shadow: 0 0 0 2px #ff980066;
+      background: rgba(255,255,255,0.13);
+    }
+    .register-card button {
+      width: 100%;
+      padding: 13px 0;
+      background: linear-gradient(90deg, #fdc500 40%, #ff9800 100%);
+      color: #222;
+      border: none;
+      border-radius: 12px;
+      font-size: 1.1em;
+      font-weight: 700;
+      letter-spacing: 1px;
+      cursor: pointer;
+      box-shadow: 0 4px 16px #ff980055;
+      margin-top: 0.2em;
+      transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+    }
+    .register-card button:hover, .register-card button:focus {
+      background: linear-gradient(90deg, #ff9800 40%, #fdc500 100%);
+      box-shadow: 0 6px 24px #ff980088;
+      transform: translateY(-2px) scale(1.03);
+    }
+    .register-card .error, .register-card .success {
+      width: 100%;
+      text-align: center;
+      margin-bottom: 0.5em;
+      font-size: 1em;
+      min-height: 1.5em;
+    }
+    .register-card .error { color: #ff4c4c; }
+    .register-card .success { color: #36ff9b; }
+    @media (max-width: 480px) {
+      .register-card { min-width: 90vw; padding: 1.2em; }
+      .register-card h2 { font-size: 1.3em; }
+    }
+  </style>
+</head>
+<body>
+  <form id="registerForm" class="register-card" autocomplete="off">
+    <h2>Sign up for Airdrop</h2>
+    <div class="error" id="error"></div>
+    <div class="success" id="success"></div>
+    <label for="username">Username</label>
+    <input type="text" id="username" name="username" placeholder="Your username" required autocomplete="username">
+    <label for="email">Email</label>
+    <input type="email" id="email" name="email" placeholder="your@email.com" required autocomplete="email">
+    <label for="password">Password</label>
+    <input type="password" id="password" name="password" placeholder="Choose a password" required autocomplete="new-password">
+    <button type="submit">Register</button>
+  </form>
+
+  <script>
+    // ---- CONFIGURATION ----
+    const APPWRITE_ENDPOINT = 'https://fra.cloud.appwrite.io/v1'; // e.g. https://cloud.appwrite.io/v1
+    const APPWRITE_PROJECT = '6839d9640019316a160d';
+    const APPWRITE_DB_ID = '6839dcca000190bf99f6';
+    const APPWRITE_COLLECTION_ID = 'users';
+
+    // ---- APPWRITE SDK INIT ----
+    const { Client, Account, Databases, ID } = Appwrite;
+    const client = new Client()
+      .setEndpoint(APPWRITE_ENDPOINT)
+      .setProject(APPWRITE_PROJECT);
+    const account = new Account(client);
+    const databases = new Databases(client);
+    // ---- REDIRECT IF ALREADY REGISTERED/LOGGED IN ----
+(async function checkAlreadyRegistered() {
+  try {
+    await account.get(); // If this works, user is logged in
+    window.location.href = 'login.html';
+  } catch (e) {
+    // User is not logged in; do nothing, let them register
+  }
+})();
+
+    document.getElementById('registerForm').onsubmit = async function(e) {
+      e.preventDefault();
+      document.getElementById('error').textContent = '';
+      document.getElementById('success').textContent = '';
+      const username = document.getElementById('username').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+
+      try {
+        // 1. Create user in Appwrite Auth
+        await account.create(ID.unique(), email, password, username);
+
+        // 2. Login user (session)
+        await account.createEmailSession(email, password);
+
+        // 3. Create user profile in Appwrite DB
+        const current = await account.get();
+        await databases.createDocument(
+          APPWRITE_DB_ID,
+          APPWRITE_COLLECTION_ID,
+          ID.unique(),
+          {
+            userId: current.$id,
+            name: username,
+            email: email
+          }
+        );
+
+        document.getElementById('success').textContent = 'Registration successful! Redirecting...';
+        setTimeout(() => window.location.href = 'main.html', 1200);
+      } catch (err) {
+        document.getElementById('error').textContent = (err.message || 'Registration failed.');
+      }
+    };
+  </script>
+</body>
+</html>
