@@ -2,39 +2,156 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <title>Login - SupremeAmer Coin Airdrop</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Word Connect - Authentication</title>
+  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;400&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/appwrite@10.0.0"></script>
+  <script src="https://cdn.jsdelivr.net/npm/appwrite@13.0.0"></script>
   <style>
-    :root {
-      --primary: #ff9800;
-      --secondary: #fdc500;
-      --success: #2ecc71;
-      --error: #e74c3c;
-      --info: #3498db;
-      --bg: #111;
-      --panel: rgba(30, 30, 40, 0.95);
-      --text: #fff;
-    }
-    
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-    
     body {
-      font-family: 'Montserrat', Arial, sans-serif;
       min-height: 100vh;
-      background: linear-gradient(135deg, var(--bg) 70%, var(--primary) 100%);
-      color: var(--text);
       display: flex;
-      justify-content: center;
       align-items: center;
-      padding: 20px;
+      justify-content: center;
+      background: linear-gradient(135deg, #1e1e2f 65%, #ff9800 100%);
+      font-family: 'Montserrat', Arial, sans-serif;
+      margin: 0;
     }
+    .login-card {
+      background: rgba(35, 35, 60, 0.8);
+      backdrop-filter: blur(8px);
+      border-radius: 24px;
+      box-shadow: 0 12px 40px #ff980055, 0 2px 24px #0008;
+      padding: 2.7em 2.1em 2.3em 2.1em;
+      min-width: 330px;
+      max-width: 90vw;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      border: 1.5px solid #fff2;
+    }
+    .login-card h2 {
+      color: #ffb900;
+      margin-bottom: 0.6em;
+      letter-spacing: 1px;
+      font-size: 2em;
+    }
+    .login-card label {
+      display: block;
+      font-size: 1em;
+      margin-bottom: 0.2em;
+      color: #fff;
+      font-weight: 400;
+      letter-spacing: 0.5px;
+    }
+    .login-card input {
+      width: 100%;
+      padding: 12px 14px;
+      margin-bottom: 1.3em;
+      border: 1.5px solid #ff980055;
+      border-radius: 8px;
+      font-size: 1em;
+      background: rgba(255,255,255,0.07);
+      color: #fff;
+      outline: none;
+      transition: border 0.2s, box-shadow 0.2s;
+      font-family: inherit;
+    }
+    .login-card input:focus {
+      border: 1.5px solid #ff9800;
+      box-shadow: 0 0 0 2px #ff980066;
+      background: rgba(255,255,255,0.13);
+    }
+    .login-card button {
+      width: 100%;
+      padding: 13px 0;
+      background: linear-gradient(90deg, #fdc500 40%, #ff9800 100%);
+      color: #222;
+      border: none;
+      border-radius: 12px;
+      font-size: 1.1em;
+      font-weight: 700;
+      letter-spacing: 1px;
+      cursor: pointer;
+      box-shadow: 0 4px 16px #ff980055;
+      margin-top: 0.2em;
+      transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+    }
+    .login-card button:hover, .login-card button:focus {
+      background: linear-gradient(90deg, #ff9800 40%, #fdc500 100%);
+      box-shadow: 0 6px 24px #ff980088;
+      transform: translateY(-2px) scale(1.03);
+    }
+    .login-card .error, .login-card .success {
+      width: 100%;
+      text-align: center;
+      margin-bottom: 0.5em;
+      font-size: 1em;
+      min-height: 1.5em;
+    }
+    .login-card .error { color: #ff4c4c; }
+    .login-card .success { color: #36ff9b; }
+    @media (max-width: 480px) {
+      .login-card { min-width: 90vw; padding: 1.2em; }
+      .login-card h2 { font-size: 1.3em; }
+    }
+  </style>
+</head>
+<body>
+  <form id="loginForm" class="login-card" autocomplete="off">
+    <h2>Login to Airdrop</h2>
+    <div class="error" id="error"></div>
+    <div class="success" id="success"></div>
+    <label for="email">Email</label>
+    <input type="email" id="email" name="email" placeholder="your@email.com" required autocomplete="email">
+    <label for="password">Password</label>
+    <input type="password" id="password" name="password" placeholder="Enter your password" required autocomplete="current-password">
+    <button type="submit">Login</button>
+  </form>
+
+  <script>
+    // ---- CONFIGURATION ----
+    const APPWRITE_ENDPOINT = 'https://fra.cloud.appwrite.io/v1'; // e.g. https://cloud.appwrite.io/v1
+    const APPWRITE_PROJECT = '6839d9640019316a160d';
+
+    // ---- APPWRITE SDK INIT ----
+    const { Client, Account } = Appwrite;
+    const client = new Client()
+      .setEndpoint(APPWRITE_ENDPOINT)
+      .setProject(APPWRITE_PROJECT);
+    const account = new Account(client);
+
+    // ---- REDIRECT IF ALREADY LOGGED IN ----
+    (async function checkAlreadyLoggedIn() {
+      try {
+        await account.get();
+        // Already logged in, redirect to main.html
+        window.location.href = 'main.html';
+      } catch (e) {
+        // Not logged in, stay on the login page
+      }
+    })();
+
+    document.getElementById('loginForm').onsubmit = async function(e) {
+      e.preventDefault();
+      document.getElementById('error').textContent = '';
+      document.getElementById('success').textContent = '';
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+
+      try {
+        // 1. Create session (login)
+        await account.createEmailSession(email, password);
+
+        document.getElementById('success').textContent = 'Login successful! Redirecting...';
+        setTimeout(() => window.location.href = 'main.html', 1200);
+      } catch (err) {
+        document.getElementById('error').textContent = (err.message || 'Login failed. Check your credentials.');
+      }
+    };
+  </script>
+</body>
+</html>    }
     
     .auth-container {
       background: var(--panel);
