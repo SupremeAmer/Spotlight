@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Two-Player Chess Game</title>
+    <title>Chess with SLX Rewards</title>
     <style>
         * {
             margin: 0;
@@ -19,6 +19,7 @@
             min-height: 100vh;
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
             padding: 20px;
+            color: white;
         }
         
         .container {
@@ -26,43 +27,74 @@
             flex-direction: column;
             align-items: center;
             gap: 20px;
-            max-width: 800px;
+            max-width: 1200px;
             width: 100%;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 20px;
         }
         
         h1 {
-            color: #fff;
-            text-align: center;
+            font-size: 2.5rem;
             margin-bottom: 10px;
             text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(90deg, #ff6b6b, #ffa86b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .tagline {
+            font-size: 1.2rem;
+            color: #ccc;
+        }
+        
+        .game-area {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 20px;
+            width: 100%;
+        }
+        
+        .chess-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .info-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
         
         .game-info {
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-            background: rgba(255, 255, 255, 0.1);
-            padding: 15px;
-            border-radius: 10px;
-            color: white;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
         
         .status {
             font-size: 1.2rem;
             font-weight: bold;
+            margin-bottom: 15px;
+            color: #ffa86b;
         }
         
         .controls {
             display: flex;
             gap: 10px;
+            margin-bottom: 15px;
         }
         
         button {
-            padding: 8px 16px;
+            padding: 10px 15px;
             border: none;
-            border-radius: 5px;
-            background: #e94560;
+            border-radius: 8px;
+            background: linear-gradient(90deg, #e94560, #ff6b6b);
             color: white;
             font-weight: bold;
             cursor: pointer;
@@ -70,8 +102,15 @@
         }
         
         button:hover {
-            background: #ff6b81;
             transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(233, 69, 96, 0.4);
+        }
+        
+        button:disabled {
+            background: #555;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
         
         .chessboard {
@@ -83,7 +122,7 @@
             grid-template-rows: repeat(8, 1fr);
             border: 5px solid #2d4059;
             border-radius: 5px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            margin: 0 auto;
         }
         
         .square {
@@ -126,36 +165,79 @@
             border: 5px solid rgba(0, 0, 0, 0.2);
         }
         
-        .notation {
-            position: absolute;
-            font-size: 0.7rem;
-            color: rgba(0, 0, 0, 0.5);
+        .user-panel {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
         
-        .notation.file {
-            bottom: 2px;
-            right: 3px;
+        .user-info {
+            margin-bottom: 15px;
         }
         
-        .notation.rank {
-            top: 2px;
-            left: 3px;
+        .user-info h3 {
+            margin-bottom: 10px;
+            color: #ffa86b;
+        }
+        
+        .balance {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #4ecdc4;
+        }
+        
+        .users-list {
+            margin-top: 15px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .user-item {
+            padding: 8px;
+            border-radius: 5px;
+            margin-bottom: 5px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .reward-system {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .reward-system h3 {
+            margin-bottom: 15px;
+            color: #ffa86b;
+        }
+        
+        .reward-details {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .reward-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.1);
         }
         
         .move-history {
-            width: 100%;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            padding: 15px;
-            color: white;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
             max-height: 200px;
             overflow-y: auto;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
         
         .move-history h3 {
             margin-bottom: 10px;
-            text-align: center;
+            color: #ffa86b;
         }
         
         .moves {
@@ -170,61 +252,132 @@
             color: #ccc;
         }
         
-        @media (max-width: 600px) {
-            .chessboard {
-                font-size: 2rem;
+        @media (max-width: 900px) {
+            .game-area {
+                grid-template-columns: 1fr;
             }
             
-            .game-info {
-                flex-direction: column;
-                gap: 10px;
-                align-items: center;
+            .chessboard {
+                max-width: 100%;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Chess Game</h1>
+        <header>
+            <h1>CHESS WITH SLX REWARDS</h1>
+            <p class="tagline">Play chess, earn SLX tokens!</p>
+        </header>
         
-        <div class="game-info">
-            <div class="status">White's turn</div>
-            <div class="controls">
-                <button id="restart">Restart Game</button>
-                <button id="undo">Undo Move</button>
+        <div class="game-area">
+            <div class="chess-section">
+                <div class="game-info">
+                    <div class="status" id="status">Select a player to start game</div>
+                    <div class="controls">
+                        <button id="start-game" disabled>Start Game (2000 SLX fee)</button>
+                        <button id="restart">Restart Game</button>
+                        <button id="undo">Undo Move</button>
+                    </div>
+                </div>
+                
+                <div class="chessboard" id="chessboard">
+                    <!-- Chessboard will be generated by JavaScript -->
+                </div>
             </div>
-        </div>
-        
-        <div class="chessboard" id="chessboard">
-            <!-- Chessboard will be generated by JavaScript -->
-        </div>
-        
-        <div class="move-history">
-            <h3>Move History</h3>
-            <div class="moves" id="move-history">
-                <!-- Move history will be added by JavaScript -->
+            
+            <div class="info-section">
+                <div class="user-panel">
+                    <div class="user-info">
+                        <h3>Current Player</h3>
+                        <div id="current-user">None selected</div>
+                        <div class="balance">Balance: <span id="user-balance">0</span> SLX</div>
+                    </div>
+                    
+                    <div class="users-list">
+                        <h3>Select Player (10000 SLX each)</h3>
+                        <div id="users-container">
+                            <!-- Users will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="reward-system">
+                    <h3>Reward System</h3>
+                    <div class="reward-details">
+                        <div class="reward-item">
+                            <span>Game Start Fee:</span>
+                            <span>2000 SLX</span>
+                        </div>
+                        <div class="reward-item">
+                            <span>Winner Reward:</span>
+                            <span>3000 SLX</span>
+                        </div>
+                        <div class="reward-item">
+                            <span>Current Prize Pool:</span>
+                            <span id="prize-pool">0 SLX</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="move-history">
+                    <h3>Move History</h3>
+                    <div class="moves" id="move-history">
+                        <!-- Move history will be added by JavaScript -->
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // DOM elements
             const chessboard = document.getElementById('chessboard');
-            const statusDisplay = document.querySelector('.status');
+            const statusDisplay = document.getElementById('status');
+            const startButton = document.getElementById('start-game');
             const restartButton = document.getElementById('restart');
             const undoButton = document.getElementById('undo');
             const moveHistoryElement = document.getElementById('move-history');
+            const currentUserElement = document.getElementById('current-user');
+            const userBalanceElement = document.getElementById('user-balance');
+            const usersContainer = document.getElementById('users-container');
+            const prizePoolElement = document.getElementById('prize-pool');
             
+            // Game state variables
             let selectedPiece = null;
             let currentPlayer = 'white';
             let moveHistory = [];
             let boardState = createInitialBoard();
+            let gameActive = false;
+            let prizePool = 0;
+            
+            // User data
+            let users = [
+                { id: 1, name: "Alice", balance: 10000 },
+                { id: 2, name: "Bob", balance: 10000 },
+                { id: 3, name: "Charlie", balance: 10000 },
+                { id: 4, name: "Diana", balance: 10000 },
+                { id: 5, name: "Ethan", balance: 10000 },
+                { id: 6, name: "Fiona", balance: 10000 },
+                { id: 7, name: "George", balance: 10000 },
+                { id: 8, name: "Hannah", balance: 10000 },
+                { id: 9, name: "Ian", balance: 10000 },
+                { id: 10, name: "Jessica", balance: 10000 }
+            ];
+            
+            let currentUser = null;
+            
+            // Initialize the game
+            function init() {
+                createBoard();
+                renderUserList();
+                updateUI();
+            }
             
             // Create the chessboard
             function createBoard() {
                 chessboard.innerHTML = '';
-                const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
-                const ranks = ['8', '7', '6', '5', '4', '3', '2', '1'];
                 
                 for (let row = 0; row < 8; row++) {
                     for (let col = 0; col < 8; col++) {
@@ -233,21 +386,6 @@
                         square.classList.add((row + col) % 2 === 0 ? 'light' : 'dark');
                         square.dataset.row = row;
                         square.dataset.col = col;
-                        
-                        // Add notation
-                        if (row === 7) {
-                            const fileNotation = document.createElement('div');
-                            fileNotation.classList.add('notation', 'file');
-                            fileNotation.textContent = files[col];
-                            square.appendChild(fileNotation);
-                        }
-                        
-                        if (col === 0) {
-                            const rankNotation = document.createElement('div');
-                            rankNotation.classList.add('notation', 'rank');
-                            rankNotation.textContent = ranks[row];
-                            square.appendChild(rankNotation);
-                        }
                         
                         square.addEventListener('click', () => handleSquareClick(row, col));
                         chessboard.appendChild(square);
@@ -288,21 +426,6 @@
                     // Clear previous content
                     square.textContent = '';
                     
-                    // Add notation if needed
-                    if (row === 7) {
-                        const fileNotation = document.createElement('div');
-                        fileNotation.classList.add('notation', 'file');
-                        fileNotation.textContent = String.fromCharCode(97 + col);
-                        square.appendChild(fileNotation);
-                    }
-                    
-                    if (col === 0) {
-                        const rankNotation = document.createElement('div');
-                        rankNotation.classList.add('notation', 'rank');
-                        rankNotation.textContent = 8 - row;
-                        square.appendChild(rankNotation);
-                    }
-                    
                     // Add piece if present
                     if (piece) {
                         square.textContent = getUnicodePiece(piece);
@@ -339,6 +462,8 @@
             
             // Handle square click
             function handleSquareClick(row, col) {
+                if (!gameActive || !currentUser) return;
+                
                 const clickedPiece = boardState[row][col];
                 
                 // If a piece is already selected
@@ -358,6 +483,11 @@
                         
                         // Add to move history
                         addToMoveHistory(selectedRow, selectedCol, row, col);
+                        
+                        // Check for game end
+                        if (checkGameEnd()) {
+                            endGame();
+                        }
                     }
                     
                     // Reset selection
@@ -425,10 +555,6 @@
                 }
                 
                 // Simplified movement rules for demo purposes
-                // In a real game, you would implement proper movement rules for each piece
-                
-                // For this demo, we'll allow any move that's not capturing own pieces
-                // and implement basic pawn movement
                 if (piece.type === 'pawn') {
                     const direction = piece.color === 'white' ? -1 : 1;
                     
@@ -457,6 +583,32 @@
                 
                 // For other pieces, allow any move (this is a simplification for the demo)
                 return true;
+            }
+            
+            // Check if the game has ended
+            function checkGameEnd() {
+                // This is a simplified check - a real game would check for checkmate
+                // For demo purposes, we'll just count moves
+                return moveHistory.length >= 10;
+            }
+            
+            // End the game and distribute rewards
+            function endGame() {
+                gameActive = false;
+                
+                // For demo, let's assume white wins
+                const winner = "white";
+                statusDisplay.textContent = `Game over! ${winner.toUpperCase()} wins!`;
+                
+                // Distribute rewards
+                if (currentUser) {
+                    // In a real game, this would be based on the actual winner
+                    currentUser.balance += 3000;
+                    prizePool = 0;
+                    updateUI();
+                    
+                    alert(`Congratulations! You won 3000 SLX! Your new balance: ${currentUser.balance} SLX`);
+                }
             }
             
             // Add move to history
@@ -491,19 +643,70 @@
                 moveHistoryElement.scrollTop = moveHistoryElement.scrollHeight;
             }
             
-            // Restart game
-            restartButton.addEventListener('click', () => {
+            // Render user list
+            function renderUserList() {
+                usersContainer.innerHTML = '';
+                users.forEach(user => {
+                    const userElement = document.createElement('div');
+                    userElement.classList.add('user-item');
+                    userElement.textContent = `${user.name} (${user.balance} SLX)`;
+                    userElement.addEventListener('click', () => selectUser(user));
+                    usersContainer.appendChild(userElement);
+                });
+            }
+            
+            // Select a user
+            function selectUser(user) {
+                currentUser = user;
+                updateUI();
+                startButton.disabled = user.balance < 2000;
+            }
+            
+            // Start the game
+            function startGame() {
+                if (!currentUser || currentUser.balance < 2000) return;
+                
+                // Deduct game fee
+                currentUser.balance -= 2000;
+                prizePool += 4000; // 2000 from each player (in real game, would be from both)
+                
+                // Initialize game state
                 boardState = createInitialBoard();
                 currentPlayer = 'white';
                 selectedPiece = null;
                 moveHistory = [];
                 moveHistoryElement.innerHTML = '';
+                gameActive = true;
+                
                 statusDisplay.textContent = "White's turn";
                 updateBoard();
-            });
+                updateUI();
+            }
+            
+            // Restart game
+            function restartGame() {
+                if (gameActive) {
+                    // Return fee to player
+                    if (currentUser) {
+                        currentUser.balance += 2000;
+                        prizePool = 0;
+                    }
+                }
+                
+                boardState = createInitialBoard();
+                currentPlayer = 'white';
+                selectedPiece = null;
+                moveHistory = [];
+                moveHistoryElement.innerHTML = '';
+                gameActive = false;
+                
+                statusDisplay.textContent = "Game reset. Select a player to start.";
+                updateBoard();
+                updateUI();
+            }
             
             // Undo move
-            undoButton.addEventListener('click', () => {
+            function undoMove() {
                 if (moveHistory.length > 0) {
                     boardState = moveHistory.pop();
                     currentPlayer = currentPlayer === 'white' ? 'black' : 'white';
@@ -519,10 +722,29 @@
                     
                     updateBoard();
                 }
-            });
+            }
+            
+            // Update UI elements
+            function updateUI() {
+                if (currentUser) {
+                    currentUserElement.textContent = currentUser.name;
+                    userBalanceElement.textContent = currentUser.balance;
+                } else {
+                    currentUserElement.textContent = "None selected";
+                    userBalanceElement.textContent = "0";
+                }
+                
+                prizePoolElement.textContent = `${prizePool} SLX`;
+                renderUserList();
+            }
+            
+            // Event listeners
+            startButton.addEventListener('click', startGame);
+            restartButton.addEventListener('click', restartGame);
+            undoButton.addEventListener('click', undoMove);
             
             // Initialize the game
-            createBoard();
+            init();
         });
     </script>
 </body>
