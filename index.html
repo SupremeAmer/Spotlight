@@ -3,1347 +3,527 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Supreme Motive | Elite Developer Portfolio</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Raleway:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>Two-Player Chess Game</title>
     <style>
-        /* Base Styles & Variables */
-        :root {
-            --primary: #2a2a72;
-            --secondary: #009ffe;
-            --accent: #ff5722;
-            --light: #f8f9fa;
-            --dark: #121212;
-            --gray: #6c757d;
-            --transition: all 0.3s ease;
-            --shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            --shadow-hover: 0 15px 30px rgba(0, 0, 0, 0.15);
-            --radius: 10px;
-            --header-height: 80px;
-        }
-
-        .dark-mode {
-            --primary: #4a4aaa;
-            --secondary: #21a7ff;
-            --accent: #ff784e;
-            --light: #1a1a1a;
-            --dark: #f8f9fa;
-            --gray: #a0a0a0;
-            --shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
-            --shadow-hover: 0 15px 30px rgba(0, 0, 0, 0.5);
-        }
-        
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
         body {
-            font-family: 'Raleway', sans-serif;
-            background-color: var(--light);
-            color: var(--dark);
-            line-height: 1.6;
-            overflow-x: hidden;
-            transition: background-color 0.5s ease, color 0.5s ease;
-        }
-        
-        h1, h2, h3, h4, h5 {
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 700;
-        }
-        
-        a {
-            text-decoration: none;
-            color: inherit;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            padding: 20px;
         }
         
         .container {
-            width: 90%;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-        
-        section {
-            padding: 100px 0;
-        }
-        
-        .btn {
-            display: inline-block;
-            padding: 14px 32px;
-            background: var(--primary);
-            color: white;
-            border-radius: var(--radius);
-            font-weight: 600;
-            transition: var(--transition);
-            border: none;
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-            z-index: 1;
-        }
-        
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 0%;
-            height: 100%;
-            background: var(--secondary);
-            transition: var(--transition);
-            z-index: -1;
-        }
-        
-        .btn:hover::before {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            max-width: 800px;
             width: 100%;
         }
         
-        .btn:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--shadow-hover);
-        }
-        
-        .section-title {
+        h1 {
+            color: #fff;
             text-align: center;
-            margin-bottom: 70px;
-            font-size: 2.8rem;
-            color: var(--primary);
-            position: relative;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
         }
         
-        .section-title::after {
-            content: '';
-            position: absolute;
-            bottom: -20px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100px;
-            height: 5px;
-            background: var(--secondary);
-            border-radius: 2px;
-        }
-        
-        /* Header & Navigation */
-        header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            z-index: 1000;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            transition: var(--transition);
-            height: var(--header-height);
-        }
-        
-        body.dark-mode header {
-            background: rgba(26, 26, 26, 0.95);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-        }
-        
-        header.scrolled {
-            height: 70px;
-        }
-        
-        nav {
+        .game-info {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            height: 100%;
-        }
-        
-        .logo {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: var(--primary);
-            display: flex;
-            align-items: center;
-        }
-        
-        .logo span {
-            color: var(--secondary);
-        }
-        
-        .nav-links {
-            display: flex;
-            list-style: none;
-        }
-        
-        .nav-links li {
-            margin-left: 30px;
-            position: relative;
-        }
-        
-        .nav-links a {
-            font-weight: 600;
-            transition: var(--transition);
-            padding: 5px 0;
-        }
-        
-        .nav-links a::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: var(--secondary);
-            transition: var(--transition);
-        }
-        
-        .nav-links a:hover::after {
             width: 100%;
-        }
-        
-        .nav-links a:hover {
-            color: var(--secondary);
-        }
-        
-        .theme-toggle {
-            background: none;
-            border: none;
-            color: var(--dark);
-            font-size: 1.2rem;
-            cursor: pointer;
-            margin-left: 20px;
-            transition: var(--transition);
-        }
-        
-        body.dark-mode .theme-toggle {
-            color: var(--light);
-        }
-        
-        .menu-btn {
-            display: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: var(--dark);
-        }
-        
-        body.dark-mode .menu-btn {
-            color: var(--light);
-        }
-        
-        /* Hero Section */
-        .hero {
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            color: white;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%23ffffff' fill-opacity='0.1' d='M0,192L48,197.3C96,203,192,213,288,229.3C384,245,480,267,576,261.3C672,256,768,224,864,224C960,224,1056,256,1152,245.3C1248,235,1344,181,1392,154.7L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E");
-            background-size: cover;
-            background-position: center;
-        }
-        
-        .hero-content {
-            position: relative;
-            z-index: 1;
-            max-width: 800px;
-            opacity: 0;
-            transform: translateY(30px);
-            animation: fadeInUp 1s ease forwards 0.5s;
-        }
-        
-        .hero h1 {
-            font-size: 3.8rem;
-            margin-bottom: 20px;
-            line-height: 1.2;
-        }
-        
-        .hero p {
-            font-size: 1.3rem;
-            margin-bottom: 40px;
-            max-width: 600px;
-        }
-        
-        .hero-btns {
-            display: flex;
-            gap: 20px;
-        }
-        
-        .btn-secondary {
-            background: transparent;
-            border: 2px solid white;
-        }
-        
-        .btn-secondary::before {
-            background: white;
-        }
-        
-        .btn-secondary:hover {
-            color: var(--primary);
-        }
-        
-        .scroll-indicator {
-            position: absolute;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            color: white;
-            opacity: 0.7;
-            transition: var(--transition);
-        }
-        
-        .scroll-indicator:hover {
-            opacity: 1;
-        }
-        
-        .scroll-indicator i {
-            font-size: 1.5rem;
-            animation: bounce 2s infinite;
-        }
-        
-        /* About Section */
-        .about-content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 60px;
-            align-items: center;
-        }
-        
-        .about-img {
-            position: relative;
-            perspective: 1000px;
-        }
-        
-        .about-img img {
-            width: 100%;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            transform: rotateY(5deg) rotateX(5deg);
-            transition: var(--transition);
-        }
-        
-        .about-img:hover img {
-            transform: rotateY(0) rotateX(0);
-            box-shadow: var(--shadow-hover);
-        }
-        
-        .about-text h3 {
-            font-size: 2.2rem;
-            margin-bottom: 25px;
-            color: var(--primary);
-        }
-        
-        .about-text p {
-            margin-bottom: 20px;
-            color: var(--gray);
-            font-size: 1.1rem;
-        }
-        
-        .about-stats {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            margin-top: 40px;
-        }
-        
-        .stat-item {
-            text-align: center;
-            padding: 20px;
-            background: var(--light);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            transition: var(--transition);
-        }
-        
-        .stat-item:hover {
-            transform: translateY(-10px);
-            box-shadow: var(--shadow-hover);
-        }
-        
-        .stat-number {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: var(--secondary);
-            margin-bottom: 10px;
-        }
-        
-        .stat-text {
-            color: var(--gray);
-            font-weight: 600;
-        }
-        
-        /* Skills Section */
-        .skills {
-            background: var(--light);
-            position: relative;
-        }
-        
-        .skills::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%232a2a72' fill-opacity='0.03' d='M0,128L48,117.3C96,107,192,85,288,112C384,139,480,213,576,224C672,235,768,181,864,181.3C960,181,1056,235,1152,234.7C1248,235,1344,181,1392,154.7L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E");
-            background-size: cover;
-            background-position: center;
-        }
-        
-        .skills-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 30px;
-            position: relative;
-            z-index: 1;
-        }
-        
-        .skill-item {
-            background: var(--light);
-            padding: 30px;
-            border-radius: var(--radius);
-            text-align: center;
-            box-shadow: var(--shadow);
-            transition: var(--transition);
-            opacity: 0;
-            transform: translateY(30px);
-        }
-        
-        .skill-item.animate {
-            opacity: 1;
-            transform: translateY(0);
-        }
-        
-        .skill-item:hover {
-            transform: translateY(-10px);
-            box-shadow: var(--shadow-hover);
-        }
-        
-        .skill-icon {
-            font-size: 3rem;
-            color: var(--secondary);
-            margin-bottom: 20px;
-        }
-        
-        .skill-item h3 {
-            margin-bottom: 15px;
-            color: var(--primary);
-            font-size: 1.5rem;
-        }
-        
-        .skill-item p {
-            color: var(--gray);
-        }
-        
-        /* Projects Section */
-        .projects-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 30px;
-        }
-        
-        .project-card {
-            background: var(--light);
-            border-radius: var(--radius);
-            overflow: hidden;
-            box-shadow: var(--shadow);
-            transition: var(--transition);
-            opacity: 0;
-            transform: translateY(30px);
-        }
-        
-        .project-card.animate {
-            opacity: 1;
-            transform: translateY(0);
-        }
-        
-        .project-card:hover {
-            transform: translateY(-10px);
-            box-shadow: var(--shadow-hover);
-        }
-        
-        .project-img {
-            height: 250px;
-            overflow: hidden;
-            position: relative;
-        }
-        
-        .project-img img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: var(--transition);
-        }
-        
-        .project-card:hover .project-img img {
-            transform: scale(1.1);
-        }
-        
-        .project-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(42, 42, 114, 0.9);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            transition: var(--transition);
-        }
-        
-        .project-card:hover .project-overlay {
-            opacity: 1;
-        }
-        
-        .project-links {
-            display: flex;
-            gap: 15px;
-        }
-        
-        .project-link {
-            width: 50px;
-            height: 50px;
-            background: var(--secondary);
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: var(--transition);
-        }
-        
-        .project-link:hover {
-            transform: translateY(-5px);
-            background: var(--accent);
-        }
-        
-        .project-info {
-            padding: 25px;
-        }
-        
-        .project-info h3 {
-            margin-bottom: 15px;
-            color: var(--primary);
-            font-size: 1.5rem;
-        }
-        
-        .project-info p {
-            color: var(--gray);
-            margin-bottom: 20px;
-        }
-        
-        .project-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        
-        .project-tags span {
-            background: rgba(0, 159, 254, 0.1);
-            color: var(--secondary);
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            font-weight: 600;
-        }
-        
-        /* Contact Section */
-        .contact {
-            background: var(--light);
-            position: relative;
-        }
-        
-        .contact::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%23009ffe' fill-opacity='0.03' d='M0,128L48,117.3C96,107,192,85,288,112C384,139,480,213,576,224C672,235,768,181,864,181.3C960,181,1056,235,1152,234.7C1248,235,1344,181,1392,154.7L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E");
-            background-size: cover;
-            background-position: center;
-        }
-        
-        .contact-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 60px;
-            position: relative;
-            z-index: 1;
-        }
-        
-        .contact-info {
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .contact-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 30px;
-            padding: 20px;
-            background: var(--light);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            transition: var(--transition);
-        }
-        
-        .contact-item:hover {
-            transform: translateX(10px);
-            box-shadow: var(--shadow-hover);
-        }
-        
-        .contact-icon {
-            width: 60px;
-            height: 60px;
-            background: var(--primary);
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            margin-right: 20px;
-            flex-shrink: 0;
-        }
-        
-        .contact-details h3 {
-            margin-bottom: 5px;
-            color: var(--primary);
-        }
-        
-        .contact-details p {
-            color: var(--gray);
-        }
-        
-        .contact-form {
-            background: var(--light);
-            padding: 40px;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-        }
-        
-        .form-group {
-            margin-bottom: 25px;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: var(--primary);
-        }
-        
-        .form-control {
-            width: 100%;
-            padding: 15px 20px;
-            border: 1px solid #ddd;
-            border-radius: var(--radius);
-            font-size: 1rem;
-            transition: var(--transition);
-            background: var(--light);
-            color: var(--dark);
-        }
-        
-        .form-control:focus {
-            border-color: var(--secondary);
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(0, 159, 254, 0.2);
-        }
-        
-        textarea.form-control {
-            min-height: 180px;
-            resize: vertical;
-        }
-        
-        /* Footer */
-        footer {
-            background: var(--dark);
-            color: white;
-            padding: 80px 0 30px;
-        }
-        
-        .footer-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 40px;
-            margin-bottom: 50px;
-        }
-        
-        .footer-col h3 {
-            font-size: 1.5rem;
-            margin-bottom: 25px;
-            position: relative;
-            padding-bottom: 15px;
-        }
-        
-        .footer-col h3::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 50px;
-            height: 3px;
-            background: var(--secondary);
-        }
-        
-        .footer-col p {
-            margin-bottom: 20px;
-            color: #adb5bd;
-            line-height: 1.8;
-        }
-        
-        .social-links {
-            display: flex;
-            gap: 15px;
-        }
-        
-        .social-links a {
-            width: 45px;
-            height: 45px;
             background: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
+            padding: 15px;
+            border-radius: 10px;
+            color: white;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .status {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        
+        .controls {
             display: flex;
-            align-items: center;
+            gap: 10px;
+        }
+        
+        button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            background: #e94560;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        button:hover {
+            background: #ff6b81;
+            transform: translateY(-2px);
+        }
+        
+        .chessboard {
+            width: 100%;
+            max-width: 560px;
+            aspect-ratio: 1/1;
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            grid-template-rows: repeat(8, 1fr);
+            border: 5px solid #2d4059;
+            border-radius: 5px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+        
+        .square {
+            display: flex;
             justify-content: center;
-            transition: var(--transition);
+            align-items: center;
+            font-size: 2.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
         }
         
-        .social-links a:hover {
-            background: var(--secondary);
-            transform: translateY(-5px);
+        .square.light {
+            background-color: #f0d9b5;
         }
         
-        .footer-links {
-            list-style: none;
+        .square.dark {
+            background-color: #b58863;
         }
         
-        .footer-links li {
-            margin-bottom: 15px;
+        .square.selected {
+            background-color: #78b9ff;
         }
         
-        .footer-links a {
-            color: #adb5bd;
-            transition: var(--transition);
-            display: block;
+        .square.valid-move::before {
+            content: "";
+            position: absolute;
+            width: 25%;
+            height: 25%;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.2);
         }
         
-        .footer-links a:hover {
-            color: var(--secondary);
-            padding-left: 10px;
+        .square.capture-valid::before {
+            content: "";
+            position: absolute;
+            width: 90%;
+            height: 90%;
+            border-radius: 50%;
+            border: 5px solid rgba(0, 0, 0, 0.2);
         }
         
-        .copyright {
+        .notation {
+            position: absolute;
+            font-size: 0.7rem;
+            color: rgba(0, 0, 0, 0.5);
+        }
+        
+        .notation.file {
+            bottom: 2px;
+            right: 3px;
+        }
+        
+        .notation.rank {
+            top: 2px;
+            left: 3px;
+        }
+        
+        .move-history {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            color: white;
+            max-height: 200px;
+            overflow-y: auto;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .move-history h3 {
+            margin-bottom: 10px;
             text-align: center;
-            padding-top: 30px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            color: #adb5bd;
-            font-size: 1rem;
         }
         
-        /* Animations */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .moves {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 5px;
         }
         
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% {
-                transform: translateY(0);
-            }
-            40% {
-                transform: translateY(-10px);
-            }
-            60% {
-                transform: translateY(-5px);
-            }
+        .move-number {
+            text-align: right;
+            padding-right: 5px;
+            color: #ccc;
         }
         
-        /* Responsive Design */
-        @media (max-width: 1200px) {
-            .hero h1 {
-                font-size: 3.2rem;
-            }
-        }
-        
-        @media (max-width: 992px) {
-            .about-content,
-            .contact-container {
-                grid-template-columns: 1fr;
-            }
-            
-            .about-img {
-                margin-bottom: 40px;
-            }
-            
-            .hero h1 {
-                font-size: 2.8rem;
-            }
-            
-            .section-title {
-                font-size: 2.5rem;
-            }
-        }
-        
-        @media (max-width: 768px) {
-            .menu-btn {
-                display: block;
-            }
-            
-            .nav-links {
-                position: fixed;
-                top: 0;
-                right: -300px;
-                width: 300px;
-                height: 100vh;
-                background: var(--light);
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                transition: var(--transition);
-                z-index: 1001;
-                box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
-            }
-            
-            body.dark-mode .nav-links {
-                background: var(--dark);
-                box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3);
-            }
-            
-            .nav-links.active {
-                right: 0;
-            }
-            
-            .nav-links li {
-                margin: 20px 0;
-            }
-            
-            .nav-links a {
-                font-size: 1.2rem;
-            }
-            
-            .hero h1 {
-                font-size: 2.5rem;
-            }
-            
-            .hero p {
-                font-size: 1.1rem;
-            }
-            
-            .section-title {
-                font-size: 2.2rem;
-            }
-            
-            .hero-btns {
-                flex-direction: column;
-                gap: 15px;
-            }
-            
-            .about-stats {
-                grid-template-columns: 1fr;
-            }
-        }
-        
-        @media (max-width: 576px) {
-            .hero h1 {
-                font-size: 2.2rem;
-            }
-            
-            .section-title {
+        @media (max-width: 600px) {
+            .chessboard {
                 font-size: 2rem;
             }
             
-            .project-card,
-            .skill-item {
-                opacity: 1;
-                transform: translateY(0);
-            }
-            
-            .projects-container {
-                grid-template-columns: 1fr;
-            }
-            
-            .contact-form {
-                padding: 25px;
-            }
-            
-            .footer-container {
-                grid-template-columns: 1fr;
+            .game-info {
+                flex-direction: column;
+                gap: 10px;
+                align-items: center;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Header & Navigation -->
-    <header id="header">
-        <div class="container">
-            <nav>
-                <a href="#" class="logo">Supreme<span>Motive</span></a>
-                <ul class="nav-links">
-                    <li><a href="#home">Home</a></li>
-                    <li><a href="#about">About</a></li>
-                    <li><a href="#skills">Skills</a></li>
-                    <li><a href="#projects">Projects</a></li>
-                    <li><a href="#contact">Contact</a></li>
-                </ul>
-                <div class="nav-right">
-                    <button class="theme-toggle" id="themeToggle">
-                        <i class="fas fa-moon"></i>
-                    </button>
-                    <div class="menu-btn">
-                        <i class="fas fa-bars"></i>
-                    </div>
-                </div>
-            </nav>
-        </div>
-    </header>
-
-    <!-- Hero Section -->
-    <section id="home" class="hero">
-        <div class="container">
-            <div class="hero-content">
-                <h1>Crafting Digital Excellence Through Code</h1>
-                <p>I'm a passionate full-stack developer specializing in building exceptional digital experiences. Currently focused on creating accessible, human-centered products.</p>
-                <div class="hero-btns">
-                    <a href="#projects" class="btn">View Projects</a>
-                    <a href="#contact" class="btn btn-secondary">Contact Me</a>
-                </div>
+    <div class="container">
+        <h1>Chess Game</h1>
+        
+        <div class="game-info">
+            <div class="status">White's turn</div>
+            <div class="controls">
+                <button id="restart">Restart Game</button>
+                <button id="undo">Undo Move</button>
             </div>
         </div>
-        <a href="#about" class="scroll-indicator">
-            <span>Scroll Down</span>
-            <i class="fas fa-chevron-down"></i>
-        </a>
-    </section>
-
-    <!-- About Section -->
-    <section id="about" class="about">
-        <div class="container">
-            <h2 class="section-title">About Me</h2>
-            <div class="about-content">
-                <div class="about-img">
-                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='500' height='400' viewBox='0 0 500 400'%3E%3Crect width='500' height='400' fill='%232a2a72' opacity='0.2'/%3E%3Ccircle cx='250' cy='180' r='80' fill='%23009ffe' opacity='0.5'/%3E%3Cpath d='M250 280 L200 380 L300 380 Z' fill='%23ff5722' opacity='0.7'/%3E%3C/svg%3E" alt="Developer Image">
-                </div>
-                <div class="about-text">
-                    <h3>Curious Developer With A Creative Mind</h3>
-                    <p>Hello! I'm Alex, a full-stack developer with over 5 years of experience specializing in building responsive, user-friendly web applications.</p>
-                    <p>I enjoy creating things that live on the internet, whether that be websites, applications, or anything in between. My goal is to always build products that provide pixel-perfect, performant experiences.</p>
-                    <p>Shortly after graduating with a degree in Computer Science, I joined the engineering team at TechCorp where I work on a wide variety of interesting and meaningful projects on a daily basis.</p>
-                    <a href="#" class="btn">Download Resume</a>
-                    
-                    <div class="about-stats">
-                        <div class="stat-item">
-                            <div class="stat-number" data-count="50">0</div>
-                            <div class="stat-text">Projects Completed</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-number" data-count="35">0</div>
-                            <div class="stat-text">Happy Clients</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-number" data-count="5">0</div>
-                            <div class="stat-text">Years Experience</div>
-                        </div>
-                    </div>
-                </div>
+        
+        <div class="chessboard" id="chessboard">
+            <!-- Chessboard will be generated by JavaScript -->
+        </div>
+        
+        <div class="move-history">
+            <h3>Move History</h3>
+            <div class="moves" id="move-history">
+                <!-- Move history will be added by JavaScript -->
             </div>
         </div>
-    </section>
-
-    <!-- Skills Section -->
-    <section id="skills" class="skills">
-        <div class="container">
-            <h2 class="section-title">My Skills</h2>
-            <div class="skills-container">
-                <div class="skill-item">
-                    <div class="skill-icon">
-                        <i class="fab fa-html5"></i>
-                    </div>
-                    <h3>Frontend Development</h3>
-                    <p>HTML, CSS, JavaScript, React, Vue, Angular, Responsive Design</p>
-                </div>
-                <div class="skill-item">
-                    <div class="skill-icon">
-                        <i class="fas fa-server"></i>
-                    </div>
-                    <h3>Backend Development</h3>
-                    <p>Node.js, Express, Python, Django, PHP, Laravel, REST APIs</p>
-                </div>
-                <div class="skill-item">
-                    <div class="skill-icon">
-                        <i class="fas fa-mobile-alt"></i>
-                    </div>
-                    <h3>Mobile Development</h3>
-                    <p>React Native, Flutter, iOS, Android, Cross-platform Solutions</p>
-                </div>
-                <div class="skill-item">
-                    <div class="skill-icon">
-                        <i class="fas fa-database"></i>
-                    </div>
-                    <h3>Database Management</h3>
-                    <p>MySQL, MongoDB, PostgreSQL, Firebase, Database Architecture</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Projects Section -->
-    <section id="projects" class="projects">
-        <div class="container">
-            <h2 class="section-title">Featured Projects</h2>
-            <div class="projects-container">
-                <div class="project-card">
-                    <div class="project-img">
-                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='250' viewBox='0 0 400 250'%3E%3Crect width='400' height='250' fill='%232a2a72'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='monospace' font-size='20' fill='white'%3EE-commerce App%3C/text%3E%3C/svg%3E" alt="E-commerce Project">
-                        <div class="project-overlay">
-                            <div class="project-links">
-                                <a href="#" class="project-link"><i class="fas fa-link"></i></a>
-                                <a href="#" class="project-link"><i class="fab fa-github"></i></a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="project-info">
-                        <h3>E-Commerce Platform</h3>
-                        <p>A full-featured online shopping platform with product management, cart, and checkout functionality.</p>
-                        <div class="project-tags">
-                            <span>React</span>
-                            <span>Node.js</span>
-                            <span>MongoDB</span>
-                            <span>Stripe</span>
-                        </div>
-                        <a href="#" class="btn">View Project</a>
-                    </div>
-                </div>
-                <div class="project-card">
-                    <div class="project-img">
-                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='250' viewBox='0 0 400 250'%3E%3Crect width='400' height='250' fill='%23009ffe'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='monospace' font-size='20' fill='white'%3ETask Management App%3C/text%3E%3C/svg%3E" alt="Task Management App">
-                        <div class="project-overlay">
-                            <div class="project-links">
-                                <a href="#" class="project-link"><i class="fas fa-link"></i></a>
-                                <a href="#" class="project-link"><i class="fab fa-github"></i></a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="project-info">
-                        <h3>Task Management App</h3>
-                        <p>A productivity application that helps users organize tasks, set deadlines, and track progress.</p>
-                        <div class="project-tags">
-                            <span>Vue.js</span>
-                            <span>Firebase</span>
-                            <span>CSS3</span>
-                            <span>PWA</span>
-                        </div>
-                        <a href="#" class="btn">View Project</a>
-                    </div>
-                </div>
-                <div class="project-card">
-                    <div class="project-img">
-                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='250' viewBox='0 0 400 250'%3E%3Crect width='400' height='250' fill='%23ff5722'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='monospace' font-size='20' fill='white'%3EFitness Tracker%3C/text%3E%3C/svg%3E" alt="Fitness Tracker">
-                        <div class="project-overlay">
-                            <div class="project-links">
-                                <a href="#" class="project-link"><i class="fas fa-link"></i></a>
-                                <a href="#" class="project-link"><i class="fab fa-github"></i></a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="project-info">
-                        <h3>Fitness Tracker</h3>
-                        <p>An application that allows users to track workouts, set fitness goals, and monitor progress.</p>
-                        <div class="project-tags">
-                            <span>React Native</span>
-                            <span>GraphQL</span>
-                            <span>Python</span>
-                            <span>AWS</span>
-                        </div>
-                        <a href="#" class="btn">View Project</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Contact Section -->
-    <section id="contact" class="contact">
-        <div class="container">
-            <h2 class="section-title">Get In Touch</h2>
-            <div class="contact-container">
-                <div class="contact-info">
-                    <div class="contact-item">
-                        <div class="contact-icon">
-                            <i class="fas fa-map-marker-alt"></i>
-                        </div>
-                        <div class="contact-details">
-                            <h3>Location</h3>
-                            <p>San Francisco, California</p>
-                        </div>
-                    </div>
-                    <div class="contact-item">
-                        <div class="contact-icon">
-                            <i class="fas fa-envelope"></i>
-                        </div>
-                        <div class="contact-details">
-                            <h3>Email</h3>
-                            <p>hello@suprememotive.dev</p>
-                        </div>
-                    </div>
-                    <div class="contact-item">
-                        <div class="contact-icon">
-                            <i class="fas fa-phone"></i>
-                        </div>
-                        <div class="contact-details">
-                            <h3>Phone</h3>
-                            <p>+1 (555) 123-4567</p>
-                        </div>
-                    </div>
-                    <div class="contact-item">
-                        <div class="contact-icon">
-                            <i class="fas fa-clock"></i>
-                        </div>
-                        <div class="contact-details">
-                            <h3>Working Hours</h3>
-                            <p>Monday - Friday: 9AM - 5PM</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="contact-form">
-                    <form id="contactForm">
-                        <div class="form-group">
-                            <label for="name">Your Name</label>
-                            <input type="text" id="name" class="form-control" placeholder="John Doe" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="email">Your Email</label>
-                            <input type="email" id="email" class="form-control" placeholder="john@example.com" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="subject">Subject</label>
-                            <input type="text" id="subject" class="form-control" placeholder="Project Discussion" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="message">Your Message</label>
-                            <textarea id="message" class="form-control" placeholder="Hello, I would like to talk about..." required></textarea>
-                        </div>
-                        <button type="submit" class="btn">Send Message</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer>
-        <div class="container">
-            <div class="footer-container">
-                <div class="footer-col">
-                    <h3>Supreme Motive</h3>
-                    <p>Creating digital experiences that stand out and make a difference. Let's build something amazing together.</p>
-                    <div class="social-links">
-                        <a href="#"><i class="fab fa-github"></i></a>
-                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                        <a href="#"><i class="fab fa-dribbble"></i></a>
-                    </div>
-                </div>
-                <div class="footer-col">
-                    <h3>Quick Links</h3>
-                    <ul class="footer-links">
-                        <li><a href="#home">Home</a></li>
-                        <li><a href="#about">About</a></li>
-                        <li><a href="#skills">Skills</a></li>
-                        <li><a href="#projects">Projects</a></li>
-                        <li><a href="#contact">Contact</a></li>
-                    </ul>
-                </div>
-                <div class="footer-col">
-                    <h3>Services</h3>
-                    <ul class="footer-links">
-                        <li><a href="#">Web Development</a></li>
-                        <li><a href="#">App Development</a></li>
-                        <li><a href="#">UI/UX Design</a></li>
-                        <li><a href="#">Consultation</a></li>
-                        <li><a href="#">Maintenance</a></li>
-                    </ul>
-                </div>
-                <div class="footer-col">
-                    <h3>Newsletter</h3>
-                    <p>Subscribe to my newsletter to receive updates on my latest work and articles.</p>
-                    <form class="newsletter-form">
-                        <div class="form-group">
-                            <input type="email" class="form-control" placeholder="Your Email" required>
-                        </div>
-                        <button type="submit" class="btn">Subscribe</button>
-                    </form>
-                </div>
-            </div>
-            <div class="copyright">
-                <p>&copy; <span id="currentYear"></span> Supreme Motive. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
+    </div>
 
     <script>
-        // Set current year in footer
-        document.getElementById('currentYear').textContent = new Date().getFullYear();
-        
-        // Sticky Header
-        window.addEventListener('scroll', function() {
-            const header = document.getElementById('header');
-            if (window.scrollY > 50) {
-                header.classList.add('scrolled');
-            } else {
-                header.classList.remove('scrolled');
-            }
-        });
-        
-        // Mobile Menu Toggle
-        const menuBtn = document.querySelector('.menu-btn');
-        const navLinks = document.querySelector('.nav-links');
-        
-        menuBtn.addEventListener('click', function() {
-            navLinks.classList.toggle('active');
-            menuBtn.querySelector('i').classList.toggle('fa-bars');
-            menuBtn.querySelector('i').classList.toggle('fa-times');
-        });
-        
-        // Close mobile menu when clicking on a link
-        document.querySelectorAll('.nav-links a').forEach(link => {
-            link.addEventListener('click', () => {
-                navLinks.classList.remove('active');
-                menuBtn.querySelector('i').classList.add('fa-bars');
-                menuBtn.querySelector('i').classList.remove('fa-times');
-            });
-        });
-        
-        // Dark/Light Mode Toggle
-        const themeToggle = document.getElementById('themeToggle');
-        const themeIcon = themeToggle.querySelector('i');
-        
-        // Check for saved theme preference or respect OS preference
-        if (localStorage.getItem('theme') === 'dark' || 
-            (window.matchMedia('(prefers-color-scheme: dark)').matches && !localStorage.getItem('theme'))) {
-            document.body.classList.add('dark-mode');
-            themeIcon.classList.remove('fa-moon');
-            themeIcon.classList.add('fa-sun');
-        }
-        
-        themeToggle.addEventListener('click', () => {
-            document.body.classList.toggle('dark-mode');
-            if (document.body.classList.contains('dark-mode')) {
-                localStorage.setItem('theme', 'dark');
-                themeIcon.classList.remove('fa-moon');
-                themeIcon.classList.add('fa-sun');
-            } else {
-                localStorage.setItem('theme', 'light');
-                themeIcon.classList.remove('fa-sun');
-                themeIcon.classList.add('fa-moon');
-            }
-        });
-        
-        // Form submission
-        const contactForm = document.getElementById('contactForm');
-        if (contactForm) {
-            contactForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                // In a real application, you would send the form data to a server here
-                alert('Thanks for your message! I\'ll get back to you soon.');
-                contactForm.reset();
-            });
-        }
-        
-        // Newsletter form submission
-        const newsletterForm = document.querySelector('.newsletter-form');
-        if (newsletterForm) {
-            newsletterForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                alert('Thanks for subscribing to my newsletter!');
-                newsletterForm.reset();
-            });
-        }
-        
-        // Animate elements on scroll
-        function animateOnScroll() {
-            const skillItems = document.querySelectorAll('.skill-item');
-            const projectCards = document.querySelectorAll('.project-card');
+        document.addEventListener('DOMContentLoaded', () => {
+            const chessboard = document.getElementById('chessboard');
+            const statusDisplay = document.querySelector('.status');
+            const restartButton = document.getElementById('restart');
+            const undoButton = document.getElementById('undo');
+            const moveHistoryElement = document.getElementById('move-history');
             
-            skillItems.forEach(item => {
-                const position = item.getBoundingClientRect().top;
-                const screenPosition = window.innerHeight / 1.3;
+            let selectedPiece = null;
+            let currentPlayer = 'white';
+            let moveHistory = [];
+            let boardState = createInitialBoard();
+            
+            // Create the chessboard
+            function createBoard() {
+                chessboard.innerHTML = '';
+                const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+                const ranks = ['8', '7', '6', '5', '4', '3', '2', '1'];
                 
-                if (position < screenPosition) {
-                    item.classList.add('animate');
+                for (let row = 0; row < 8; row++) {
+                    for (let col = 0; col < 8; col++) {
+                        const square = document.createElement('div');
+                        square.classList.add('square');
+                        square.classList.add((row + col) % 2 === 0 ? 'light' : 'dark');
+                        square.dataset.row = row;
+                        square.dataset.col = col;
+                        
+                        // Add notation
+                        if (row === 7) {
+                            const fileNotation = document.createElement('div');
+                            fileNotation.classList.add('notation', 'file');
+                            fileNotation.textContent = files[col];
+                            square.appendChild(fileNotation);
+                        }
+                        
+                        if (col === 0) {
+                            const rankNotation = document.createElement('div');
+                            rankNotation.classList.add('notation', 'rank');
+                            rankNotation.textContent = ranks[row];
+                            square.appendChild(rankNotation);
+                        }
+                        
+                        square.addEventListener('click', () => handleSquareClick(row, col));
+                        chessboard.appendChild(square);
+                    }
                 }
-            });
+                updateBoard();
+            }
             
-            projectCards.forEach(card => {
-                const position = card.getBoundingClientRect().top;
-                const screenPosition = window.innerHeight / 1.3;
+            // Create initial board state
+            function createInitialBoard() {
+                const board = Array(8).fill().map(() => Array(8).fill(null));
                 
-                if (position < screenPosition) {
-                    card.classList.add('animate');
+                // Set up pawns
+                for (let col = 0; col < 8; col++) {
+                    board[1][col] = { type: 'pawn', color: 'black' };
+                    board[6][col] = { type: 'pawn', color: 'white' };
                 }
-            });
-        }
-        
-        window.addEventListener('scroll', animateOnScroll);
-        // Initial check in case elements are already in view
-        animateOnScroll();
-        
-        // Animate stats counter
-        function animateCounter() {
-            const counters = document.querySelectorAll('.stat-number');
-            const speed = 200;
-            
-            counters.forEach(counter => {
-                const target = +counter.getAttribute('data-count');
-                const count = +counter.innerText;
-                const increment = Math.ceil(target / speed);
                 
-                if (count < target) {
-                    counter.innerText = count + increment;
-                    setTimeout(() => animateCounter(), 1);
+                // Set up other pieces
+                const pieceOrder = ['rook', 'knight', 'bishop', 'queen', 'king', 'bishop', 'knight', 'rook'];
+                
+                for (let col = 0; col < 8; col++) {
+                    board[0][col] = { type: pieceOrder[col], color: 'black' };
+                    board[7][col] = { type: pieceOrder[col], color: 'white' };
+                }
+                
+                return board;
+            }
+            
+            // Update the visual board based on boardState
+            function updateBoard() {
+                const squares = chessboard.querySelectorAll('.square');
+                squares.forEach(square => {
+                    const row = parseInt(square.dataset.row);
+                    const col = parseInt(square.dataset.col);
+                    const piece = boardState[row][col];
+                    
+                    // Clear previous content
+                    square.textContent = '';
+                    
+                    // Add notation if needed
+                    if (row === 7) {
+                        const fileNotation = document.createElement('div');
+                        fileNotation.classList.add('notation', 'file');
+                        fileNotation.textContent = String.fromCharCode(97 + col);
+                        square.appendChild(fileNotation);
+                    }
+                    
+                    if (col === 0) {
+                        const rankNotation = document.createElement('div');
+                        rankNotation.classList.add('notation', 'rank');
+                        rankNotation.textContent = 8 - row;
+                        square.appendChild(rankNotation);
+                    }
+                    
+                    // Add piece if present
+                    if (piece) {
+                        square.textContent = getUnicodePiece(piece);
+                    }
+                    
+                    // Remove selection and valid move indicators
+                    square.classList.remove('selected', 'valid-move', 'capture-valid');
+                });
+            }
+            
+            // Get Unicode symbol for a piece
+            function getUnicodePiece(piece) {
+                const pieces = {
+                    white: {
+                        king: '♔',
+                        queen: '♕',
+                        rook: '♖',
+                        bishop: '♗',
+                        knight: '♘',
+                        pawn: '♙'
+                    },
+                    black: {
+                        king: '♚',
+                        queen: '♛',
+                        rook: '♜',
+                        bishop: '♝',
+                        knight: '♞',
+                        pawn: '♟'
+                    }
+                };
+                
+                return pieces[piece.color][piece.type];
+            }
+            
+            // Handle square click
+            function handleSquareClick(row, col) {
+                const clickedPiece = boardState[row][col];
+                
+                // If a piece is already selected
+                if (selectedPiece) {
+                    const [selectedRow, selectedCol] = selectedPiece;
+                    
+                    // Check if the move is valid
+                    if (isValidMove(selectedRow, selectedCol, row, col)) {
+                        // Make the move
+                        moveHistory.push(JSON.parse(JSON.stringify(boardState)));
+                        boardState[row][col] = boardState[selectedRow][selectedCol];
+                        boardState[selectedRow][selectedCol] = null;
+                        
+                        // Switch player
+                        currentPlayer = currentPlayer === 'white' ? 'black' : 'white';
+                        statusDisplay.textContent = `${currentPlayer.charAt(0).toUpperCase() + currentPlayer.slice(1)}'s turn`;
+                        
+                        // Add to move history
+                        addToMoveHistory(selectedRow, selectedCol, row, col);
+                    }
+                    
+                    // Reset selection
+                    selectedPiece = null;
+                    updateBoard();
+                    return;
+                }
+                
+                // If no piece is selected yet
+                if (clickedPiece && clickedPiece.color === currentPlayer) {
+                    selectedPiece = [row, col];
+                    highlightSquare(row, col);
+                    showValidMoves(row, col);
+                }
+            }
+            
+            // Highlight selected square
+            function highlightSquare(row, col) {
+                const squares = chessboard.querySelectorAll('.square');
+                squares.forEach(square => {
+                    const squareRow = parseInt(square.dataset.row);
+                    const squareCol = parseInt(square.dataset.col);
+                    
+                    if (squareRow === row && squareCol === col) {
+                        square.classList.add('selected');
+                    }
+                });
+            }
+            
+            // Show valid moves for selected piece
+            function showValidMoves(row, col) {
+                const piece = boardState[row][col];
+                if (!piece) return;
+                
+                const squares = chessboard.querySelectorAll('.square');
+                
+                for (let r = 0; r < 8; r++) {
+                    for (let c = 0; c < 8; c++) {
+                        if (isValidMove(row, col, r, c)) {
+                            squares.forEach(square => {
+                                const squareRow = parseInt(square.dataset.row);
+                                const squareCol = parseInt(square.dataset.col);
+                                
+                                if (squareRow === r && squareCol === c) {
+                                    if (boardState[r][c]) {
+                                        square.classList.add('capture-valid');
+                                    } else {
+                                        square.classList.add('valid-move');
+                                    }
+                                }
+                            });
+                        }
+                    }
+                }
+            }
+            
+            // Check if a move is valid (simplified version)
+            function isValidMove(fromRow, fromCol, toRow, toCol) {
+                const piece = boardState[fromRow][fromCol];
+                if (!piece) return false;
+                
+                // Can't capture own pieces
+                if (boardState[toRow][toCol] && boardState[toRow][toCol].color === piece.color) {
+                    return false;
+                }
+                
+                // Simplified movement rules for demo purposes
+                // In a real game, you would implement proper movement rules for each piece
+                
+                // For this demo, we'll allow any move that's not capturing own pieces
+                // and implement basic pawn movement
+                if (piece.type === 'pawn') {
+                    const direction = piece.color === 'white' ? -1 : 1;
+                    
+                    // Move forward one square
+                    if (fromCol === toCol && fromRow + direction === toRow && !boardState[toRow][toCol]) {
+                        return true;
+                    }
+                    
+                    // Move forward two squares from starting position
+                    if (fromCol === toCol && 
+                        ((piece.color === 'white' && fromRow === 6 && toRow === 4 && !boardState[5][toCol] && !boardState[4][toCol]) ||
+                         (piece.color === 'black' && fromRow === 1 && toRow === 3 && !boardState[2][toCol] && !boardState[3][toCol]))) {
+                        return true;
+                    }
+                    
+                    // Capture diagonally
+                    if (Math.abs(fromCol - toCol) === 1 && 
+                        fromRow + direction === toRow && 
+                        boardState[toRow][toCol] && 
+                        boardState[toRow][toCol].color !== piece.color) {
+                        return true;
+                    }
+                    
+                    return false;
+                }
+                
+                // For other pieces, allow any move (this is a simplification for the demo)
+                return true;
+            }
+            
+            // Add move to history
+            function addToMoveHistory(fromRow, fromCol, toRow, toCol) {
+                const piece = boardState[toRow][toCol];
+                const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+                const ranks = ['8', '7', '6', '5', '4', '3', '2', '1'];
+                
+                const fromFile = files[fromCol];
+                const fromRank = ranks[fromRow];
+                const toFile = files[toCol];
+                const toRank = ranks[toRow];
+                
+                const moveNumber = Math.floor(moveHistory.length / 2) + 1;
+                const isWhiteMove = moveHistory.length % 2 === 0;
+                
+                const moveText = `${piece.type.charAt(0).toUpperCase()}${fromFile}${fromRank}-${toFile}${toRank}`;
+                
+                if (isWhiteMove) {
+                    const moveElement = document.createElement('div');
+                    moveElement.innerHTML = `
+                        <div class="move-number">${moveNumber}.</div>
+                        <div>${moveText}</div>
+                    `;
+                    moveHistoryElement.appendChild(moveElement);
                 } else {
-                    counter.innerText = target;
+                    const lastMove = moveHistoryElement.lastChild;
+                    lastMove.innerHTML += `<div>${moveText}</div>`;
+                }
+                
+                // Scroll to bottom
+                moveHistoryElement.scrollTop = moveHistoryElement.scrollHeight;
+            }
+            
+            // Restart game
+            restartButton.addEventListener('click', () => {
+                boardState = createInitialBoard();
+                currentPlayer = 'white';
+                selectedPiece = null;
+                moveHistory = [];
+                moveHistoryElement.innerHTML = '';
+                statusDisplay.textContent = "White's turn";
+                updateBoard();
+            });
+            
+            // Undo move
+            undoButton.addEventListener('click', () => {
+                if (moveHistory.length > 0) {
+                    boardState = moveHistory.pop();
+                    currentPlayer = currentPlayer === 'white' ? 'black' : 'white';
+                    statusDisplay.textContent = `${currentPlayer.charAt(0).toUpperCase() + currentPlayer.slice(1)}'s turn`;
+                    
+                    // Remove last move from history
+                    if (moveHistory.length % 2 === 1) {
+                        moveHistoryElement.removeChild(moveHistoryElement.lastChild);
+                    } else {
+                        const lastMove = moveHistoryElement.lastChild;
+                        lastMove.removeChild(lastMove.lastChild);
+                    }
+                    
+                    updateBoard();
                 }
             });
-        }
-        
-        // Start counter animation when stats section is in view
-        function checkCounter() {
-            const statsSection = document.querySelector('.about-stats');
-            if (statsSection) {
-                const position = statsSection.getBoundingClientRect().top;
-                const screenPosition = window.innerHeight / 1.3;
-                
-                if (position < screenPosition) {
-                    animateCounter();
-                    window.removeEventListener('scroll', checkCounter);
-                }
-            }
-        }
-        
-        window.addEventListener('scroll', checkCounter);
-        // Initial check in case stats are already in view
-        checkCounter();
+            
+            // Initialize the game
+            createBoard();
+        });
     </script>
 </body>
 </html>
